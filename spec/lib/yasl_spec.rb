@@ -9,6 +9,8 @@ RSpec.describe do
                     :registration_time,
                     :registration_date,
                     :registration_date_time,
+                    :complex_number,
+                    :complex_polar_number,
                     :owner
     end
     class Person
@@ -34,6 +36,8 @@ RSpec.describe do
       car.registration_time = Time.new(2003, 10, 19, 10, 39, 37.092, '-03:00')
       car.registration_date = Date.new(2003, 10, 19)
       car.registration_date_time = DateTime.new(2003, 10, 19, 10, 39, 37.092, '-03:00')
+      car.complex_number = Complex(2,37)
+      car.complex_polar_number = Complex.polar(-23,28)
     end
   }
   
@@ -75,6 +79,18 @@ RSpec.describe do
           },
           ruby_basic_data_type_data: car1.registration_date_time.marshal_dump
         },
+        complex_number: {
+          class: {
+            name: 'Complex'
+          },
+          ruby_basic_data_type_data: car1.complex_number.to_s
+        },
+        complex_polar_number: {
+          class: {
+            name: 'Complex'
+          },
+          ruby_basic_data_type_data: car1.complex_polar_number.to_s
+        },
       )
       expect(dump).to eq(expected_dump)
     end
@@ -86,6 +102,7 @@ RSpec.describe do
       
       dump = YASL.dump(car1)
       
+      # TODO refactor this dump structure
       expected_dump = JSON.dump(
         class: {
           name: car1.class.name
@@ -111,6 +128,18 @@ RSpec.describe do
           },
           ruby_basic_data_type_data: car1.registration_date_time.marshal_dump
         },
+        complex_number: {
+          class: {
+            name: 'Complex'
+          },
+          ruby_basic_data_type_data: car1.complex_number.to_s
+        },
+        complex_polar_number: {
+          class: {
+            name: 'Complex'
+          },
+          ruby_basic_data_type_data: car1.complex_polar_number.to_s
+        },
         owner: {
           class: {
             name: 'Person'
@@ -130,7 +159,6 @@ RSpec.describe do
     
     xit 'serializes namespaced class' do
     end
-    xit 'serializes date_time'
     xit 'serializes complex'
     xit 'serializes complex.polar'
     xit 'serializes regex'
