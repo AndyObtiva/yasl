@@ -36,13 +36,16 @@ module YASL
     
     def ruby_basic_data_type?(object)
       json_basic_data_type?(object) ||
-        object.is_a?(Time)
+        object.is_a?(Time) ||
+        object.is_a?(Date)
     end
     
     def ruby_basic_data_type_data(object)
       # TODO Consider the new Ruby pattern matching feature for this
       if object.is_a?(Time)
         object.to_datetime.marshal_dump
+      elsif object.is_a?(Date)
+        object.marshal_dump
       end
     end
   end
