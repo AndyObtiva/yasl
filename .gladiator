@@ -1,7 +1,7 @@
 ---
-:selected_child_path: "/Users/User/code/yasl/README.md"
+:selected_child_path: "/Users/User/code/yasl/lib/yasl.rb"
 :split_orientation: horizontal
-:caret_position: 0
+:caret_position: 284
 :top_pixel: 0
 :shell_width: 1440
 :shell_height: 835
@@ -10,7 +10,11 @@
 :open_file_paths1:
 - "/Users/User/code/yasl/README.md"
 - "/Users/User/code/yasl/Rakefile"
-:open_file_paths2: []
+- "/Users/User/code/yasl/Gemfile"
+- "/Users/User/code/yasl/lib/yasl.rb"
+:open_file_paths2:
+- "/Users/User/code/yasl/spec/spec_helper.rb"
+- "/Users/User/code/yasl/spec/lib/yasl_spec.rb"
 :ignore_paths:
 - ".gladiator"
 - ".git"
