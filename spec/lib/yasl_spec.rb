@@ -8,6 +8,7 @@ RSpec.describe do
                     :year,
                     :registration_time,
                     :registration_date,
+                    :registration_date_time,
                     :owner
     end
     class Person
@@ -18,7 +19,8 @@ RSpec.describe do
   
   after do
     [
-      :Car
+      :Car,
+      :Person,
     ].each do |class_name|
       Object.send(:remove_const, class_name)
     end
@@ -31,7 +33,7 @@ RSpec.describe do
       car.year = '2002'
       car.registration_time = Time.new(2003, 10, 19, 10, 39, 37.092, '-03:00')
       car.registration_date = Date.new(2003, 10, 19)
-#       car.registration_date_time = '2002'
+      car.registration_date_time = DateTime.new(2003, 10, 19, 10, 39, 37.092, '-03:00')
     end
   }
   
@@ -67,11 +69,17 @@ RSpec.describe do
           },
           ruby_basic_data_type_data: car1.registration_date.marshal_dump
         },
+        registration_date_time: {
+          class: {
+            name: 'DateTime'
+          },
+          ruby_basic_data_type_data: car1.registration_date_time.marshal_dump
+        },
       )
       expect(dump).to eq(expected_dump)
     end
     
-    xit 'recursively (1 level deep) serializes instance variables that are not basic data types' do
+    it 'recursively (1 level deep) serializes instance variables that are not basic data types' do
       car1
       person1
       car1.owner = person1
@@ -97,6 +105,12 @@ RSpec.describe do
           },
           ruby_basic_data_type_data: car1.registration_date.marshal_dump
         },
+        registration_date_time: {
+          class: {
+            name: 'DateTime'
+          },
+          ruby_basic_data_type_data: car1.registration_date_time.marshal_dump
+        },
         owner: {
           class: {
             name: 'Person'
@@ -116,8 +130,6 @@ RSpec.describe do
     
     xit 'serializes namespaced class' do
     end
-    xit 'serializes date'
-    xit 'serializes time'
     xit 'serializes date_time'
     xit 'serializes complex'
     xit 'serializes complex.polar'
