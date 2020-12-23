@@ -1,4 +1,5 @@
 # YASL - Yet Another Serialization Library
+![Ruby](https://github.com/AndyObtiva/yasl/workflows/Ruby/badge.svg)
 
 A Ruby serialization library that serializes/deserializes objects through their instance variables and Struct members by default without complaining about unserializable objects.
 
