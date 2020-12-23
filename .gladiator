@@ -1,0 +1,21 @@
+---
+:selected_child_path: "/Users/User/code/yasl/README.md"
+:split_orientation: horizontal
+:caret_position: 0
+:top_pixel: 0
+:shell_width: 1440
+:shell_height: 835
+:shell_x: 0
+:shell_y: 24
+:open_file_paths1:
+- "/Users/User/code/yasl/README.md"
+- "/Users/User/code/yasl/Rakefile"
+:open_file_paths2: []
+:ignore_paths:
+- ".gladiator"
+- ".git"
+- coverage
+- packages
+- node_modules
+- tmp
+- vendor
