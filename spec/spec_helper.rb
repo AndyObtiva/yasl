@@ -103,4 +103,6 @@ RSpec.configure do |config|
 end
 
 $LOAD_PATH.unshift File.expand_path(File.join(__FILE__, '..', '..', 'lib'))
+
+require 'puts_debuggerer'
 require 'yasl'

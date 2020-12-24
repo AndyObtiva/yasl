@@ -1,34 +1,26 @@
 require 'spec_helper'
 
+class Car
+  attr_accessor :make,
+                :model,
+                :year,
+                :registration_time,
+                :registration_date,
+                :registration_date_time,
+                :complex_number,
+                :complex_polar_number,
+                :rational_number,
+                :owner
+end
+
+module Driving
+  class Person
+    attr_accessor :name,
+                  :dob
+  end
+end
+
 RSpec.describe do
-  before do
-    class Car
-      attr_accessor :make,
-                    :model,
-                    :year,
-                    :registration_time,
-                    :registration_date,
-                    :registration_date_time,
-                    :complex_number,
-                    :complex_polar_number,
-                    :rational_number,
-                    :owner
-    end
-    class Person
-      attr_accessor :name,
-                    :dob
-    end
-  end
-  
-  after do
-    [
-      :Car,
-      :Person,
-    ].each do |class_name|
-      Object.send(:remove_const, class_name)
-    end
-  end
-  
   let(:car1) {
     Car.new.tap do |car|
       car.make = 'Mitsubishi'
@@ -43,8 +35,17 @@ RSpec.describe do
     end
   }
   
-  let(:person1) {
-    Person.new.tap do |person|
+  let(:car2) {
+    Car.new.tap do |car|
+      car.make = 'Mitsubishi'
+      car.model = 'Eclipse'
+      car.year = '2002'
+      car.owner = person2
+    end
+  }
+  
+  let(:person2) {
+    Driving::Person.new.tap do |person|
       person.name = 'Sean Tux'
       person.dob = Time.new(2000, 11, 28)
     end
@@ -52,134 +53,74 @@ RSpec.describe do
   
   describe '#dump' do
     it 'serializes instance variables of all Ruby basic data types' do
-      car1
-      
       dump = YASL.dump(car1)
       
       expected_dump = JSON.dump(
-        class: {
-          name: car1.class.name
-        },
-        make: car1.make,
-        model: car1.model,
-        year: car1.year,
-        registration_time: {
-          class: {
-            name: 'Time'
+        _class: car1.class.name,
+        _instance_variables: {
+          make: car1.make,
+          model: car1.model,
+          year: car1.year,
+          registration_time: {
+            _class: 'Time',
+            _data: car1.registration_time.to_datetime.marshal_dump
           },
-          ruby_basic_data_type_data: car1.registration_time.to_datetime.marshal_dump
-        },
-        registration_date: {
-          class: {
-            name: 'Date'
+          registration_date: {
+            _class: 'Date',
+            _data: car1.registration_date.marshal_dump
           },
-          ruby_basic_data_type_data: car1.registration_date.marshal_dump
-        },
-        registration_date_time: {
-          class: {
-            name: 'DateTime'
+          registration_date_time: {
+            _class: 'DateTime',
+            _data: car1.registration_date_time.marshal_dump
           },
-          ruby_basic_data_type_data: car1.registration_date_time.marshal_dump
-        },
-        complex_number: {
-          class: {
-            name: 'Complex'
+          complex_number: {
+            _class: 'Complex',
+            _data: car1.complex_number.to_s
           },
-          ruby_basic_data_type_data: car1.complex_number.to_s
-        },
-        complex_polar_number: {
-          class: {
-            name: 'Complex'
+          complex_polar_number: {
+            _class: 'Complex',
+            _data: car1.complex_polar_number.to_s
           },
-          ruby_basic_data_type_data: car1.complex_polar_number.to_s
-        },
-        rational_number: {
-          class: {
-            name: 'Rational'
+          rational_number: {
+            _class: 'Rational',
+            _data: car1.rational_number.to_s
           },
-          ruby_basic_data_type_data: car1.rational_number.to_s
-        },
+        }
       )
       expect(dump).to eq(expected_dump)
     end
     
     it 'recursively (1 level deep) serializes instance variables that are not basic data types' do
-      car1
-      person1
-      car1.owner = person1
-      
-      dump = YASL.dump(car1)
+      dump = YASL.dump(car2)
       
       # TODO refactor this dump structure
       expected_dump = JSON.dump(
-        class: {
-          name: car1.class.name
-        },
-        make: car1.make,
-        model: car1.model,
-        year: car1.year,
-        registration_time: {
-          class: {
-            name: 'Time'
-          },
-          ruby_basic_data_type_data: car1.registration_time.to_datetime.marshal_dump
-        },
-        registration_date: {
-          class: {
-            name: 'Date'
-          },
-          ruby_basic_data_type_data: car1.registration_date.marshal_dump
-        },
-        registration_date_time: {
-          class: {
-            name: 'DateTime'
-          },
-          ruby_basic_data_type_data: car1.registration_date_time.marshal_dump
-        },
-        complex_number: {
-          class: {
-            name: 'Complex'
-          },
-          ruby_basic_data_type_data: car1.complex_number.to_s
-        },
-        complex_polar_number: {
-          class: {
-            name: 'Complex'
-          },
-          ruby_basic_data_type_data: car1.complex_polar_number.to_s
-        },
-        rational_number: {
-          class: {
-            name: 'Rational'
-          },
-          ruby_basic_data_type_data: car1.rational_number.to_s
-        },
-        owner: {
-          class: {
-            name: 'Person'
-          },
-          name: person1.name,
-          dob: {
-            class: {
-              name: 'Time'
-            },
-            ruby_basic_data_type_data: person1.dob.to_datetime.marshal_dump
+        _class: car2.class.name,
+        _instance_variables: {
+          make: car2.make,
+          model: car2.model,
+          year: car2.year,
+          owner: {
+            _class: 'Driving::Person',
+            _instance_variables: {
+              name: person2.name,
+              dob: {
+                _class: 'Time',
+                _data: person2.dob.to_datetime.marshal_dump
+              }
+            }
           }
         }
       )
       expect(dump).to eq(expected_dump)
     end
     
-    
-    xit 'serializes namespaced class' do
-    end
-    xit 'serializes rational'
     xit 'serializes regex'
     xit 'serializes symbol'
     xit 'serializes sets'
     xit 'serializes enumerables'
-    xit 'serializes struct members' do
-    end
+    xit 'serializes struct members'
+    xit 'serializes class variables'
     xit 'handle exception with instance variable matching class name'
   end
   

@@ -8,17 +8,18 @@ module YASL
     end
     
     def dump_structure(object)
-      hash = {class: {}}
-      hash[:class][:name] = object.class.name
+      hash = {}
+      hash[:_class] = object.class.name
       if ruby_basic_data_type?(object)
-        hash[:ruby_basic_data_type_data] = ruby_basic_data_type_data(object)
+        hash[:_data] = ruby_basic_data_type_data(object)
       else
+        hash[:_instance_variables] = {}
         object.instance_variables.each do |var|
           value = object.instance_variable_get(var)
           # TODO consider using marshal_dump and marshal_load for date objects
           # e.g. for marshalling time, convert to datetime first: DateTime.new.marshal_load(JSON.load(JSON.dump(t.to_datetime.marshal_dump))).to_time
           value = dump_structure(value) unless json_only_basic_data_type?(value)
-          hash[var.to_s.sub('@', '')] = value
+          hash[:_instance_variables][var.to_s.sub('@', '')] = value
         end
       end
       hash
