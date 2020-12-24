@@ -10,6 +10,8 @@ class Car
                 :complex_number,
                 :complex_polar_number,
                 :rational_number,
+                :regex,
+                :symbol,
                 :owner
 end
 
@@ -32,6 +34,8 @@ RSpec.describe do
       car.complex_number = Complex(2,37)
       car.complex_polar_number = Complex.polar(-23,28)
       car.rational_number = Rational(22/7)
+      car.regex = /^[a-z][1-9]$/
+      car.symbol = :good
     end
   }
   
@@ -85,6 +89,14 @@ RSpec.describe do
             _class: 'Rational',
             _data: car1.rational_number.to_s
           },
+          regex: {
+            _class: 'Regexp',
+            _data: car1.regex.to_s
+          },
+          symbol: {
+            _class: 'Symbol',
+            _data: car1.symbol.to_s
+          },
         }
       )
       expect(dump).to eq(expected_dump)
@@ -115,9 +127,7 @@ RSpec.describe do
       expect(dump).to eq(expected_dump)
     end
     
-    xit 'serializes regex'
-    xit 'serializes symbol'
-    xit 'serializes sets'
+    xit 'serializes set'
     xit 'serializes enumerables'
     xit 'serializes struct members'
     xit 'serializes class variables'

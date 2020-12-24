@@ -2,6 +2,9 @@ require 'json'
 require 'date'
 
 module YASL
+  JSON_BASIC_DATA_TYPES = [NilClass, String, Numeric, Hash, Array, TrueClass, FalseClass]
+  RUBY_ONLY_BASIC_DATA_TYPES = [Time, Date, Complex, Rational, Regexp, Symbol]
+  
   class << self
     def dump(object)
       JSON.dump(dump_structure(object))
@@ -30,25 +33,19 @@ module YASL
     end
     
     def json_basic_data_type?(object)
-      object.nil? ||
-        object.is_a?(String) ||
-        object.is_a?(Numeric) ||
-        object.is_a?(Hash) ||
-        object.is_a?(Array) || # TODO check of Set and other enumerables qualify too
-        object.is_a?(TrueClass) ||
-        object.is_a?(FalseClass)
+      JSON_BASIC_DATA_TYPES.reduce(false) do |result, klass|
+        result || object.is_a?(klass)
+      end
     end
     
     def ruby_only_basic_data_type?(object)
-        object.is_a?(Time) ||
-        object.is_a?(Date) || # includes DateTime
-        object.is_a?(Complex) ||
-        object.is_a?(Rational)
+      RUBY_ONLY_BASIC_DATA_TYPES.reduce(false) do |result, klass|
+        result || object.is_a?(klass)
+      end
     end
     
     def ruby_basic_data_type?(object)
-      json_basic_data_type?(object) ||
-        ruby_only_basic_data_type?(object)
+      json_basic_data_type?(object) || ruby_only_basic_data_type?(object)
     end
     
     def ruby_basic_data_type_data(object)
@@ -60,6 +57,10 @@ module YASL
       elsif object.is_a?(Complex)
         object.to_s
       elsif object.is_a?(Rational)
+        object.to_s
+      elsif object.is_a?(Regexp)
+        object.to_s
+      elsif object.is_a?(Symbol)
         object.to_s
       end
     end
