@@ -11,6 +11,7 @@ RSpec.describe do
                     :registration_date_time,
                     :complex_number,
                     :complex_polar_number,
+                    :rational_number,
                     :owner
     end
     class Person
@@ -38,6 +39,7 @@ RSpec.describe do
       car.registration_date_time = DateTime.new(2003, 10, 19, 10, 39, 37.092, '-03:00')
       car.complex_number = Complex(2,37)
       car.complex_polar_number = Complex.polar(-23,28)
+      car.rational_number = Rational(22/7)
     end
   }
   
@@ -91,6 +93,12 @@ RSpec.describe do
           },
           ruby_basic_data_type_data: car1.complex_polar_number.to_s
         },
+        rational_number: {
+          class: {
+            name: 'Rational'
+          },
+          ruby_basic_data_type_data: car1.rational_number.to_s
+        },
       )
       expect(dump).to eq(expected_dump)
     end
@@ -140,6 +148,12 @@ RSpec.describe do
           },
           ruby_basic_data_type_data: car1.complex_polar_number.to_s
         },
+        rational_number: {
+          class: {
+            name: 'Rational'
+          },
+          ruby_basic_data_type_data: car1.rational_number.to_s
+        },
         owner: {
           class: {
             name: 'Person'
@@ -159,15 +173,14 @@ RSpec.describe do
     
     xit 'serializes namespaced class' do
     end
-    xit 'serializes complex'
-    xit 'serializes complex.polar'
+    xit 'serializes rational'
     xit 'serializes regex'
     xit 'serializes symbol'
-    xit 'serializes rational'
     xit 'serializes sets'
     xit 'serializes enumerables'
     xit 'serializes struct members' do
     end
+    xit 'handle exception with instance variable matching class name'
   end
   
   describe '#load' do

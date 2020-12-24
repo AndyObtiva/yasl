@@ -41,7 +41,8 @@ module YASL
     def ruby_only_basic_data_type?(object)
         object.is_a?(Time) ||
         object.is_a?(Date) || # includes DateTime
-        object.is_a?(Complex)
+        object.is_a?(Complex) ||
+        object.is_a?(Rational)
     end
     
     def ruby_basic_data_type?(object)
@@ -56,6 +57,8 @@ module YASL
       elsif object.is_a?(Date)
         object.marshal_dump
       elsif object.is_a?(Complex)
+        object.to_s
+      elsif object.is_a?(Rational)
         object.to_s
       end
     end
