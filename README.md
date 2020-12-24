@@ -10,6 +10,8 @@ There are many Ruby serialization libraries out there, but none simply serialize
 ## Assumptions
 
 - Both the server and client contain the same Ruby classes
+- Zero configuration. Developers are too busy solving business domain problems to worry about low-level serialization details.
+- Silently ignore all that is not serializable like Proc, Binding, and IO objects
 - JSON is good enough. No need for premature optimization.
 
 ## Usage Instructions

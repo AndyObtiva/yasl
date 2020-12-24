@@ -3,7 +3,7 @@ require 'date'
 
 module YASL
   JSON_BASIC_DATA_TYPES = [NilClass, String, Integer, Float, Hash, Array, TrueClass, FalseClass]
-  RUBY_ONLY_BASIC_DATA_TYPES = [Time, Date, Complex, Rational, Regexp, Symbol]
+  RUBY_ONLY_BASIC_DATA_TYPES = [Time, Date, Complex, Rational, Regexp, Symbol, Set, Range]
   RUBY_BASIC_DATA_TYPES = RUBY_ONLY_BASIC_DATA_TYPES + JSON_BASIC_DATA_TYPES
   
   class << self
@@ -50,6 +50,10 @@ module YASL
         object.to_s
       elsif object.is_a?(Symbol)
         object.to_s
+      elsif object.is_a?(Set)
+        object.to_a
+      elsif object.is_a?(Range)
+        [object.begin, object.end, object.exclude_end?]
       end
     end
     

@@ -12,6 +12,9 @@ class Car
                 :rational_number,
                 :regex,
                 :symbol,
+                :set,
+                :range,
+                :range_exclusive,
                 :owner
 end
 
@@ -36,6 +39,9 @@ RSpec.describe do
       car.rational_number = Rational(22/7)
       car.regex = /^[a-z][1-9]$/
       car.symbol = :good
+      car.set = Set.new([1, 'b', 3.7])
+      car.range = (1..7)
+      car.range_exclusive = (1...7)
     end
   }
   
@@ -140,6 +146,18 @@ RSpec.describe do
             _class: 'Symbol',
             _data: car1.symbol.to_s
           },
+          set: {
+            _class: 'Set',
+            _data: car1.set.to_a
+          },
+          range: {
+            _class: 'Range',
+            _data: [car1.range.begin, car1.range.end, car1.range.exclude_end?]
+          },
+          range_exclusive: {
+            _class: 'Range',
+            _data: [car1.range_exclusive.begin, car1.range_exclusive.end, car1.range_exclusive.exclude_end?]
+          },
         }
       )
       expect(dump).to eq(expected_dump)
@@ -169,8 +187,6 @@ RSpec.describe do
       expect(dump).to eq(expected_dump)
     end
     
-    xit 'serializes set'
-    xit 'serializes enumerables'
     xit 'serializes struct members'
     xit 'serializes class variables'
     xit 'handle exception with instance variable matching class name'
