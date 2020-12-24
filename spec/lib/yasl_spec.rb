@@ -56,6 +56,49 @@ RSpec.describe do
   }
   
   describe '#dump' do
+    it 'serializes Integer JSON basic data type' do
+      dump = YASL.dump(3)
+      
+      expect(dump).to eq(JSON.dump(3))
+    end
+    
+    it 'serializes Float JSON basic data type' do
+      dump = YASL.dump(3.14)
+      
+      expect(dump).to eq(JSON.dump(3.14))
+    end
+    
+    it 'serializes String JSON basic data type' do
+      dump = YASL.dump('Sean')
+      
+      expect(dump).to eq(JSON.dump('Sean'))
+    end
+    
+    it 'serializes Boolean JSON basic data type' do
+      expect(YASL.dump(true)).to eq(JSON.dump(true))
+      expect(YASL.dump(false)).to eq(JSON.dump(false))
+    end
+    
+    it 'serializes Nil JSON basic data type' do
+      dump = YASL.dump(nil)
+      
+      expect(dump).to eq(JSON.dump(nil))
+    end
+    
+    it 'serializes Array JSON basic data type' do
+      array = ['a', 2, 44.4]
+      dump = YASL.dump(array)
+      
+      expect(dump).to eq(JSON.dump(array))
+    end
+    
+    it 'serializes Hash JSON basic data type' do
+      hash = {key1: 'value1', key2: 'value2'}
+      dump = YASL.dump(hash)
+      
+      expect(dump).to eq(JSON.dump(hash))
+    end
+    
     it 'serializes instance variables of all Ruby basic data types' do
       dump = YASL.dump(car1)
       
@@ -105,7 +148,6 @@ RSpec.describe do
     it 'recursively (1 level deep) serializes instance variables that are not basic data types' do
       dump = YASL.dump(car2)
       
-      # TODO refactor this dump structure
       expected_dump = JSON.dump(
         _class: car2.class.name,
         _instance_variables: {
