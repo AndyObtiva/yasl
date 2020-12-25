@@ -20,9 +20,17 @@ module YASL
         structure[:_data] = ruby_basic_data_type_data(object)
       else
         structure[:_class] = object.class.name
-        structure[:_instance_variables] = object.instance_variables.reduce({}) do |instance_vars, var|
-          value = object.instance_variable_get(var)
-          instance_vars.merge(var.to_s.sub('@', '') => dump_structure(value))
+        if !object.instance_variables.empty?
+          structure[:_instance_variables] = object.instance_variables.reduce({}) do |instance_vars, var|
+            value = object.instance_variable_get(var)
+            instance_vars.merge(var.to_s.sub('@', '') => dump_structure(value))
+          end
+        end
+        if object.is_a?(Struct)
+          structure[:_member_values] = object.members.reduce({}) do |member_values, member|
+            value = object[member]
+            value.nil? ? member_values : member_values.merge(member => dump_structure(value))
+          end
         end
       end
       structure
