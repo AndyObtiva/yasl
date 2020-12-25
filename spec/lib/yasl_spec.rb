@@ -1,6 +1,26 @@
 require 'spec_helper'
 
 class Car
+  class << self
+    def reset_count!
+      @count = 0
+    end
+    
+    def increment_count!
+      @count ||= 0
+      @count += 1
+    end
+    
+    def reset_class_count!
+      @@class_count = 0
+    end
+    
+    def increment_class_count!
+      @@class_count = 0 unless defined?(@@class_count)
+      @@class_count += 1
+    end
+  end
+  
   attr_accessor :make,
                 :model,
                 :year,
@@ -16,6 +36,11 @@ class Car
                 :range,
                 :range_exclusive,
                 :owner
+  
+  def initialize
+    self.class.increment_count!
+    self.class.increment_class_count!
+  end
 end
 
 class CarStruct < Struct.new(
@@ -40,8 +65,32 @@ end
 
 module Driving
   class Person
-    attr_accessor :name,
-                  :dob
+    class << self
+      def reset_count!
+        @count = 0
+      end
+      
+      def increment_count!
+        @count ||= 0
+        @count += 1
+      end
+      
+      def reset_class_count!
+        @@class_count = 0
+      end
+      
+      def increment_class_count!
+        @@class_count = 0 unless defined?(@@class_count)
+        @@class_count += 1
+      end
+    end
+    
+    attr_accessor :name, :dob
+    
+    def initialize
+      self.class.increment_count!
+      self.class.increment_class_count!
+    end
   end
   
 end
@@ -110,48 +159,57 @@ RSpec.describe do
     end
   }
   
+  before do
+    Car.reset_class_count!
+    Car.reset_count!
+    Driving::Person.reset_class_count!
+    Driving::Person.reset_count!
+  end
+  
   describe '#dump' do
-    it 'serializes Integer JSON basic data type' do
-      dump = YASL.dump(3)
+    context 'JSON Basic Data Types' do
+      it 'serializes Integer JSON basic data type' do
+        dump = YASL.dump(3)
+        
+        expect(dump).to eq(JSON.dump(3))
+      end
       
-      expect(dump).to eq(JSON.dump(3))
-    end
-    
-    it 'serializes Float JSON basic data type' do
-      dump = YASL.dump(3.14)
+      it 'serializes Float JSON basic data type' do
+        dump = YASL.dump(3.14)
+        
+        expect(dump).to eq(JSON.dump(3.14))
+      end
       
-      expect(dump).to eq(JSON.dump(3.14))
-    end
-    
-    it 'serializes String JSON basic data type' do
-      dump = YASL.dump('Sean')
+      it 'serializes String JSON basic data type' do
+        dump = YASL.dump('Sean')
+        
+        expect(dump).to eq(JSON.dump('Sean'))
+      end
       
-      expect(dump).to eq(JSON.dump('Sean'))
-    end
-    
-    it 'serializes Boolean JSON basic data type' do
-      expect(YASL.dump(true)).to eq(JSON.dump(true))
-      expect(YASL.dump(false)).to eq(JSON.dump(false))
-    end
-    
-    it 'serializes Nil JSON basic data type' do
-      dump = YASL.dump(nil)
+      it 'serializes Boolean JSON basic data type' do
+        expect(YASL.dump(true)).to eq(JSON.dump(true))
+        expect(YASL.dump(false)).to eq(JSON.dump(false))
+      end
       
-      expect(dump).to eq(JSON.dump(nil))
-    end
-    
-    it 'serializes Array JSON basic data type' do
-      array = ['a', 2, 44.4]
-      dump = YASL.dump(array)
+      it 'serializes Nil JSON basic data type' do
+        dump = YASL.dump(nil)
+        
+        expect(dump).to eq(JSON.dump(nil))
+      end
       
-      expect(dump).to eq(JSON.dump(array))
-    end
-    
-    it 'serializes Hash JSON basic data type' do
-      hash = {key1: 'value1', key2: 'value2'}
-      dump = YASL.dump(hash)
+      it 'serializes Array JSON basic data type' do
+        array = ['a', 2, 44.4]
+        dump = YASL.dump(array)
+        
+        expect(dump).to eq(JSON.dump(array))
+      end
       
-      expect(dump).to eq(JSON.dump(hash))
+      it 'serializes Hash JSON basic data type' do
+        hash = {key1: 'value1', key2: 'value2'}
+        dump = YASL.dump(hash)
+        
+        expect(dump).to eq(JSON.dump(hash))
+      end
     end
     
     context 'Ruby objects and basic data types' do
@@ -208,12 +266,23 @@ RSpec.describe do
               _class: 'Range',
               _data: [car1.range_exclusive.begin, car1.range_exclusive.end, car1.range_exclusive.exclude_end?]
             },
-          }
+          },
+          _classes: [
+            {
+              _class: car2.class.name,
+              _class_variables: {
+                class_count: 1,
+              },
+              _instance_variables: {
+                count: 1,
+              },
+            }
+          ],
         )
         expect(dump).to eq(expected_dump)
       end
       
-      it 'recursively (1 level deep) serializes instance variables that are not basic data types' do
+      it 'recursively serializes instance variables that are not basic data types' do
         dump = YASL.dump(car2)
         
         expected_dump = JSON.dump(
@@ -232,7 +301,27 @@ RSpec.describe do
                 }
               }
             }
-          }
+          },
+          _classes: [
+            {
+              _class: car2.class.name,
+              _class_variables: {
+                class_count: 1,
+              },
+              _instance_variables: {
+                count: 1,
+              },
+            },
+            {
+              _class: person2.class.name,
+              _class_variables: {
+                class_count: 1,
+              },
+              _instance_variables: {
+                count: 1,
+              },
+            }
+          ],
         )
         expect(dump).to eq(expected_dump)
       end
@@ -298,7 +387,7 @@ RSpec.describe do
         expect(dump).to eq(expected_dump)
       end
          
-      it 'recursively (1 level deep) serializes member values and instance variables that are not basic data types' do
+      it 'recursively serializes member values and instance variables that are not basic data types' do
         dump = YASL.dump(car_struct2)
         
         expected_dump = JSON.dump(
@@ -320,17 +409,26 @@ RSpec.describe do
             model: car_struct2.model,
             year: car_struct2.year,
           },
-        )
+          _classes: [
+            {
+              _class: person2.class.name,
+              _class_variables: {
+                class_count: 1,
+              },
+              _instance_variables: {
+                count: 1,
+              },
+            }
+          ],        )
         expect(dump).to eq(expected_dump)
       end
     end
     
-    xit 'serializes class variables'
-    xit 'handle exception with instance variable matching class name'
     xit 'handle cycles'
   end
   
   describe '#load' do
     xit 'deserializes basic object (no nesting)'
+    xit 'handle cycles'
   end
 end

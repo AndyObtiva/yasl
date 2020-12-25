@@ -8,10 +8,27 @@ module YASL
   
   class << self
     def dump(object)
-      JSON.dump(dump_structure(object))
+      JSON.dump(dump_structure_with_classes(object))
     end
     
-    def dump_structure(object)
+    def dump_structure_with_classes(object)
+      classes = []
+      original_classes = classes.clone
+      structure = dump_structure(object, classes)
+      while classes.size > original_classes.size
+        diff = (classes - original_classes)
+        original_classes = classes.clone
+        diff.each do |klass|
+          unless klass.class_variables.empty? && klass.instance_variables.empty?
+            structure[:_classes] ||= []
+            structure[:_classes] << dump_structure(klass, classes)
+          end
+        end
+      end
+      structure
+    end
+    
+    def dump_structure(object, classes = nil)
       structure = {}
       if json_basic_data_type?(object)
         structure = object
@@ -19,17 +36,25 @@ module YASL
         structure[:_class] = object.class.name
         structure[:_data] = ruby_basic_data_type_data(object)
       else
-        structure[:_class] = object.class.name
+        klass = object.is_a?(Class) ? object : object.class
+        structure[:_class] = klass.name
+        classes << klass unless classes.nil? || classes.include?(klass)
+        if object.respond_to?(:class_variables) && !object.class_variables.empty?
+          structure[:_class_variables] = object.class_variables.reduce({}) do |class_vars, var|
+            value = object.class_variable_get(var)
+            class_vars.merge(var.to_s.sub('@@', '') => dump_structure(value, classes))
+          end
+        end
         if !object.instance_variables.empty?
           structure[:_instance_variables] = object.instance_variables.reduce({}) do |instance_vars, var|
             value = object.instance_variable_get(var)
-            instance_vars.merge(var.to_s.sub('@', '') => dump_structure(value))
+            instance_vars.merge(var.to_s.sub('@', '') => dump_structure(value, classes))
           end
         end
         if object.is_a?(Struct)
           structure[:_member_values] = object.members.reduce({}) do |member_values, member|
             value = object[member]
-            value.nil? ? member_values : member_values.merge(member => dump_structure(value))
+            value.nil? ? member_values : member_values.merge(member => dump_structure(value, classes))
           end
         end
       end
