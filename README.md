@@ -52,8 +52,7 @@ class Car
                 :registration_date_time,
                 :complex_number,
                 :complex_polar_number,
-                :rational_number,
-                :owner
+                :rational_number
 end
 
 car = Car.new

@@ -14,9 +14,12 @@ module YASL
       structure
     end
     
-    def dump_structure(object)
+    def dump_structure(object, for_classes: false)
       structure = {}
-      if YASL.json_basic_data_type?(object)
+      if top_level_class?(object, for_classes)
+        structure[:_class] = object.name
+        add_to_classes(object)
+      elsif YASL.json_basic_data_type?(object)
         structure = object
       elsif YASL.ruby_basic_data_type?(object)
         structure[:_class] = object.class.name
@@ -42,7 +45,7 @@ module YASL
     end
     
     def dump_class_structure(klass)
-      dump_structure(klass) unless klass.class_variables.empty? && klass.instance_variables.empty?
+      dump_structure(klass, for_classes: true) unless klass.class_variables.empty? && klass.instance_variables.empty?
     end
     
     def dump_ruby_basic_data_type_data(object)
@@ -69,17 +72,23 @@ module YASL
     def dump_non_basic_data_type_structure(object)
       structure = {}
       klass = class_for(object)
+      add_to_classes(klass)
       structure[:_class] = klass.name
-      classes << klass unless classes.include?(klass)
       the_object_id = object_id(object)
       if the_object_id.nil?
-        structure[:_id] = add_to_class_array(object) unless object.is_a?(Class) || object.is_a?(Module)
-        structure.merge!(dump_class_variables(object))
-        structure.merge!(dump_instance_variables(object))
-        structure.merge!(dump_struct_member_values(object))
+        structure.merge!(dump_new_non_basic_data_type_structure(object))
       else
         structure[:_id] = the_object_id
       end
+      structure
+    end
+    
+    def dump_new_non_basic_data_type_structure(object)
+      structure = {}
+      structure[:_id] = add_to_class_array(object) unless object.is_a?(Class) || object.is_a?(Module)
+      structure.merge!(dump_class_variables(object))
+      structure.merge!(dump_instance_variables(object))
+      structure.merge!(dump_struct_member_values(object))
       structure
     end
     
@@ -119,8 +128,16 @@ module YASL
         
     private
     
+    def top_level_class?(object, for_classes)
+      (object.is_a?(Class) || object.is_a?(Module)) && !for_classes
+    end
+    
     def class_for(object)
-      object.is_a?(Class) ? object : object.class
+      object.is_a?(Class) || object.is_a?(Module) ? object : object.class
+    end
+    
+    def add_to_classes(object)
+      classes << object unless classes.include?(object)
     end
     
     def object_id(object)

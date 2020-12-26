@@ -9,8 +9,12 @@ module YASL
   RUBY_BASIC_DATA_TYPES = RUBY_ONLY_BASIC_DATA_TYPES + JSON_BASIC_DATA_TYPES
   
   class << self
-    def dump(object)
-      JSON.dump(Dumper.new(object).dump)
+    def dump(object, include_classes: true)
+      JSON.dump(Dumper.new(object).dump(include_classes: include_classes))
+    end
+    
+    def load(data)
+      # TODO alias initialize on every class loaded to bypass argument requirements
     end
     
     def json_basic_data_type?(object)

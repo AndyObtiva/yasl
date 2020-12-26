@@ -35,6 +35,8 @@ class Car
                 :set,
                 :range,
                 :range_exclusive,
+                :class_attribute,
+                :module_attribute,
                 :owner
   
   def initialize
@@ -64,6 +66,16 @@ class CarStruct < Struct.new(
 end
 
 module Driving
+  class << self
+    def set_var!
+      @var = 'var value'
+    end
+    
+    def reset_var!
+      remove_instance_variable(:@var) if defined?(@var)
+    end
+  end
+
   class Person
     class << self
       def reset_count!
@@ -112,6 +124,8 @@ RSpec.describe do
       car.set = Set.new([1, 'b', 3.7])
       car.range = (1..7)
       car.range_exclusive = (1...7)
+      car.class_attribute = Car
+      car.module_attribute = Driving
     end
   }
   
@@ -213,6 +227,7 @@ RSpec.describe do
     Car.reset_count!
     Driving::Person.reset_class_count!
     Driving::Person.reset_count!
+    Driving.reset_var!
   end
   
   describe '#dump' do
@@ -333,6 +348,12 @@ RSpec.describe do
               _class: 'Range',
               _data: [car1.range_exclusive.begin, car1.range_exclusive.end, car1.range_exclusive.exclude_end?]
             },
+            class_attribute: {
+              _class: 'Car',
+            },
+            module_attribute: {
+              _class: 'Driving',
+            },
           },
           _classes: [
             {
@@ -343,7 +364,7 @@ RSpec.describe do
               _instance_variables: {
                 count: 1,
               },
-            }
+            },
           ],
         )
         expect(dump).to eq(expected_dump)
@@ -684,9 +705,48 @@ RSpec.describe do
       expect(dump).to eq(expected_dump)
     end
     
-    it 'serializes direct class'
-    it 'serializes direct module'
-    # TODO handle exception case of not needing to id class or module directly
+    it 'serializes class (adding to classes)' do
+      car1
+      car2
+      car3
+      car4
+      
+      dump = YASL.dump(Car)
+      
+      expected_dump = JSON.dump(
+        _class: 'Car',
+        _classes: [
+          {
+            _class: 'Car',
+            _class_variables: {
+              class_count: 4,
+            },
+            _instance_variables: {
+              count: 4,
+            },
+          }
+        ]
+      )
+      expect(dump).to eq(expected_dump)
+    end
+    
+    it 'serializes module (adding to classes since the module singleton class is a class)' do
+      Driving.set_var!
+      dump = YASL.dump(Driving)
+      
+      expected_dump = JSON.dump(
+        _class: 'Driving',
+        _classes: [
+          {
+            _class: 'Driving',
+            _instance_variables: {
+              var: 'var value',
+            },
+          }
+        ]
+      )
+      expect(dump).to eq(expected_dump)
+    end
   end
   
   describe '#load' do
