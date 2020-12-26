@@ -16,8 +16,8 @@ Juwelier::Tasks.new do |gem|
   gem.name = "yasl"
   gem.homepage = "http://github.com/AndyObtiva/yasl"
   gem.license = "MIT"
-  gem.summary = %Q{A Ruby serialization library that serializes/deserializes objects through their instance variables and Struct members by default without complaining about unserializable objects}
-  gem.description = %Q{A Ruby serialization library that serializes/deserializes objects through their instance variables and Struct members by default without complaining about unserializable objects}
+  gem.summary = %Q{A Ruby alternative serialization library to Marshal that serializes without complaining about unserializable objects.}
+  gem.description = %Q{A Ruby alternative serialization library to Marshal that serializes without complaining about unserializable objects.}
   gem.email = "andy.am@gmail.com"
   gem.authors = ["Andy Maleh"]
 

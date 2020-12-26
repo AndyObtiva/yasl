@@ -261,7 +261,7 @@ RSpec.describe do
         expect(dump).to eq(JSON.dump(nil))
       end
       
-      it 'serializes Array JSON basic data type' do
+      it 'serializes Array Ruby basic data type' do
         array = ['a', 2, 44.4]
         dump = YASL.dump(array)
         
@@ -272,7 +272,7 @@ RSpec.describe do
         expect(dump).to eq(expected_dump)
       end
       
-      it 'serializes Hash JSON basic data type' do
+      it 'serializes Hash Ruby basic data type' do
         hash = {key1: 'value1', key2: 'value2'}
         dump = YASL.dump(hash)
         
@@ -750,7 +750,73 @@ RSpec.describe do
   end
   
   describe '#load' do
-    xit 'deserializes JSON basic data type'
+    context 'JSON Basic Data Types' do
+      it 'deserializes Integer JSON basic data type' do
+        object = YASL.load(JSON.dump(3))
+        
+        expect(object).to eq(3)
+      end
+      
+      it 'deserializes Float JSON basic data type' do
+        object = YASL.load(JSON.dump(3.14))
+        
+        expect(object).to eq(3.14)
+      end
+      
+      it 'deserializes String JSON basic data type' do
+        object = YASL.load(JSON.dump('Sean'))
+        
+        expect(object).to eq('Sean')
+      end
+      
+      it 'deserializes Boolean JSON basic data type' do
+        object = YASL.load(JSON.dump(true))
+        
+        expect(object).to eq(true)
+
+        object = YASL.load(JSON.dump(false))
+        
+        expect(object).to eq(false)
+      end
+      
+      it 'deserializes Nil JSON basic data type' do
+        object = YASL.load(JSON.dump(nil))
+        
+        expect(object).to eq(nil)
+      end
+      
+      xit 'deserializes Array Ruby basic data type' do
+        array = ['a', 2, 44.4]
+        object = YASL.load(JSON.dump(
+          _class: 'Array',
+          _data: array
+        ))
+        
+        expect(object).to eq(array)
+      end
+      
+      xit 'deserializes Hash Ruby basic data type' do
+        # TODO flip this serialize code to deserialize
+        hash = {key1: 'value1', key2: 'value2'}
+        dump = YASL.dump(hash)
+        
+        expected_dump = JSON.dump(
+          _class: 'Hash',
+          _data: {
+            {
+              _class: 'Symbol',
+              _data: 'key1',
+            } => 'value1',
+            {
+              _class: 'Symbol',
+              _data: 'key2',
+            } => 'value2',
+          }
+        )
+        expect(dump).to eq(expected_dump)
+      end
+    end
+  
     xit 'deserializes basic object (no nesting)'
     xit 'deserializes object recursively'
     xit 'deserializes object recursively with cycles'

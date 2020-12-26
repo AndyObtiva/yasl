@@ -3,7 +3,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/AndyObtiva/yasl/badge.svg?branch=master)](https://coveralls.io/github/AndyObtiva/yasl?branch=master)
 [![Maintainability](https://api.codeclimate.com/v1/badges/e8d043b8c78c801f0aa3/maintainability)](https://codeclimate.com/github/AndyObtiva/yasl/maintainability)
 
-A Ruby serialization library that serializes/deserializes objects through their instance variables and Struct members by default without complaining about unserializable objects.
+A Ruby alternative serialization library to Marshal that serializes without complaining about unserializable objects.
 
 ## Background
 
