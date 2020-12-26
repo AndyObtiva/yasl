@@ -85,7 +85,7 @@ module Driving
       end
     end
     
-    attr_accessor :name, :dob
+    attr_accessor :name, :dob, :cars
     
     def initialize
       self.class.increment_count!
@@ -117,10 +117,26 @@ RSpec.describe do
   
   let(:car2) {
     Car.new.tap do |car|
-      car.make = 'Mitsubishi'
-      car.model = 'Eclipse'
+      car.make = 'Toyota'
+      car.model = 'Camry'
+      car.year = '2001'
+      car.owner = person1
+    end
+  }
+  
+  let(:car3) {
+    Car.new.tap do |car|
+      car.make = 'Nissan'
+      car.model = 'Murano'
       car.year = '2002'
-      car.owner = person2
+    end
+  }
+  
+  let(:car4) {
+    Car.new.tap do |car|
+      car.make = 'Honda'
+      car.model = 'Accord'
+      car.year = '2000'
     end
   }
   
@@ -148,14 +164,47 @@ RSpec.describe do
       car.make = 'Mitsubishi'
       car.model = 'Eclipse'
       car.year = '2002'
-      car.owner = person2
+      car.owner = person1
+    end
+  }
+  
+  let(:person1) {
+    Driving::Person.new.tap do |person|
+      person.name = 'Sean Tux'
+      person.dob = Time.new(2000, 11, 28)
     end
   }
   
   let(:person2) {
     Driving::Person.new.tap do |person|
-      person.name = 'Sean Tux'
+      person.name = 'Scruff McGruff'
       person.dob = Time.new(2000, 11, 28)
+      person.cars = [
+        car3,
+        car4,
+      ]
+    end
+  }
+  
+  let(:person3) {
+    Driving::Person.new.tap do |person|
+      person.name = 'Linda Biggins'
+      person.dob = Time.new(2000, 11, 28)
+      person.cars = {
+        'car1' => car3,
+        'car2' => car4,
+      }
+    end
+  }
+  
+  let(:person4) {
+    Driving::Person.new.tap do |person|
+      person.name = 'Joan Cars'
+      person.dob = Time.new(2000, 11, 28)
+      person.cars = [
+        car3.tap {|c| c.owner = person},
+        car4.tap {|c| c.owner = person},
+      ]
     end
   }
   
@@ -201,14 +250,31 @@ RSpec.describe do
         array = ['a', 2, 44.4]
         dump = YASL.dump(array)
         
-        expect(dump).to eq(JSON.dump(array))
+        expected_dump = JSON.dump(
+          _class: 'Array',
+          _data: array
+        )
+        expect(dump).to eq(expected_dump)
       end
       
       it 'serializes Hash JSON basic data type' do
         hash = {key1: 'value1', key2: 'value2'}
         dump = YASL.dump(hash)
         
-        expect(dump).to eq(JSON.dump(hash))
+        expected_dump = JSON.dump(
+          _class: 'Hash',
+          _data: {
+            {
+              _class: 'Symbol',
+              _data: 'key1',
+            } => 'value1',
+            {
+              _class: 'Symbol',
+              _data: 'key2',
+            } => 'value2',
+          }
+        )
+        expect(dump).to eq(expected_dump)
       end
     end
     
@@ -294,10 +360,10 @@ RSpec.describe do
             owner: {
               _class: 'Driving::Person',
               _instance_variables: {
-                name: person2.name,
+                name: person1.name,
                 dob: {
                   _class: 'Time',
-                  _data: person2.dob.to_datetime.marshal_dump
+                  _data: person1.dob.to_datetime.marshal_dump
                 }
               }
             }
@@ -313,7 +379,7 @@ RSpec.describe do
               },
             },
             {
-              _class: person2.class.name,
+              _class: person1.class.name,
               _class_variables: {
                 class_count: 1,
               },
@@ -396,10 +462,10 @@ RSpec.describe do
             owner: {
               _class: 'Driving::Person',
               _instance_variables: {
-                name: person2.name,
+                name: person1.name,
                 dob: {
                   _class: 'Time',
-                  _data: person2.dob.to_datetime.marshal_dump
+                  _data: person1.dob.to_datetime.marshal_dump
                 }
               }
             }
@@ -411,7 +477,7 @@ RSpec.describe do
           },
           _classes: [
             {
-              _class: person2.class.name,
+              _class: person1.class.name,
               _class_variables: {
                 class_count: 1,
               },
@@ -424,11 +490,140 @@ RSpec.describe do
       end
     end
     
-    xit 'handle cycles'
+    it 'serializes array containing non-JSON basic data type objects' do
+      dump = YASL.dump(person2)
+      
+      expected_dump = JSON.dump(
+        _class: person2.class.name,
+        _instance_variables: {
+          name: person2.name,
+          dob: {
+            _class: 'Time',
+            _data: person2.dob.to_datetime.marshal_dump
+          },
+          cars: {
+            _class: 'Array',
+            _data: [
+              {
+                _class: car3.class.name,
+                _instance_variables: {
+                  make: car3.make,
+                  model: car3.model,
+                  year: car3.year,
+                },
+              },
+              {
+                _class: car4.class.name,
+                _instance_variables: {
+                  make: car4.make,
+                  model: car4.model,
+                  year: car4.year,
+                },
+              },
+            ]
+          }
+        },
+        _classes: [
+          {
+            _class: person1.class.name,
+            _class_variables: {
+              class_count: 1,
+            },
+            _instance_variables: {
+              count: 1,
+            },
+          },
+          {
+            _class: car2.class.name,
+            _class_variables: {
+              class_count: 2,
+            },
+            _instance_variables: {
+              count: 2,
+            },
+          },
+        ],
+      )
+      expect(dump).to eq(expected_dump)
+    end
+    
+    it 'serializes hash containing non-JSON basic data type objects' do
+      dump = YASL.dump(person3)
+      
+      expected_dump = JSON.dump(
+        _class: person3.class.name,
+        _instance_variables: {
+          name: person3.name,
+          dob: {
+            _class: 'Time',
+            _data: person3.dob.to_datetime.marshal_dump
+          },
+          cars: {
+            _class: 'Hash',
+            _data: {
+              car1: {
+                _class: car3.class.name,
+                _instance_variables: {
+                  make: car3.make,
+                  model: car3.model,
+                  year: car3.year,
+                },
+              },
+              car2: {
+                _class: car4.class.name,
+                _instance_variables: {
+                  make: car4.make,
+                  model: car4.model,
+                  year: car4.year,
+                },
+              },
+            }
+          }
+        },
+        _classes: [
+          {
+            _class: person1.class.name,
+            _class_variables: {
+              class_count: 1,
+            },
+            _instance_variables: {
+              count: 1,
+            },
+          },
+          {
+            _class: car2.class.name,
+            _class_variables: {
+              class_count: 2,
+            },
+            _instance_variables: {
+              count: 2,
+            },
+          },
+        ],
+      )
+      expect(dump).to eq(expected_dump)
+    end
+    
+    xit 'serializes recursively with cycles' do
+      dump = YASL.dump(person4)
+      
+      expected_dump = JSON.dump(
+      ''
+      )
+      puts dump
+      expect(dump).to eq(expected_dump)
+    end
+    
+    it 'serializes direct class'
+    
+    it 'serializes direct module'
+    
   end
   
   describe '#load' do
+    xit 'deserializes JSON basic data type'
     xit 'deserializes basic object (no nesting)'
-    xit 'handle cycles'
+    xit 'deserializes object recursively'
+    xit 'deserializes object recursively with cycles'
   end
 end

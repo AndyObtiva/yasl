@@ -2,8 +2,8 @@ require 'json'
 require 'date'
 
 module YASL
-  JSON_BASIC_DATA_TYPES = [NilClass, String, Integer, Float, Hash, Array, TrueClass, FalseClass]
-  RUBY_ONLY_BASIC_DATA_TYPES = [Time, Date, Complex, Rational, Regexp, Symbol, Set, Range]
+  JSON_BASIC_DATA_TYPES = [NilClass, String, Integer, Float, TrueClass, FalseClass]
+  RUBY_ONLY_BASIC_DATA_TYPES = [Time, Date, Complex, Rational, Regexp, Symbol, Set, Range, Array, Hash]
   RUBY_BASIC_DATA_TYPES = RUBY_ONLY_BASIC_DATA_TYPES + JSON_BASIC_DATA_TYPES
   
   class << self
@@ -34,7 +34,7 @@ module YASL
         structure = object
       elsif ruby_basic_data_type?(object)
         structure[:_class] = object.class.name
-        structure[:_data] = ruby_basic_data_type_data(object)
+        structure[:_data] = ruby_basic_data_type_data(object, classes)
       else
         klass = object.is_a?(Class) ? object : object.class
         structure[:_class] = klass.name
@@ -69,7 +69,7 @@ module YASL
       type_in?(object, RUBY_BASIC_DATA_TYPES)
     end
     
-    def ruby_basic_data_type_data(object)
+    def ruby_basic_data_type_data(object, classes = nil)
       # TODO Consider the new Ruby pattern matching feature for this
       if object.is_a?(Time)
         object.to_datetime.marshal_dump
@@ -87,6 +87,12 @@ module YASL
         object.to_a
       elsif object.is_a?(Range)
         [object.begin, object.end, object.exclude_end?]
+      elsif object.is_a?(Array)
+        object.map {|object| dump_structure(object, classes)}
+      elsif object.is_a?(Hash)
+        object.reduce({}) do |new_hash, pair|
+          new_hash.merge(dump_structure(pair.first, classes) => dump_structure(pair.last, classes))
+        end
       end
     end
     

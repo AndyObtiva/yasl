@@ -5,7 +5,7 @@ A Ruby serialization library that serializes/deserializes objects through their 
 
 ## Background
 
-There are many Ruby serialization libraries out there, but none simply serialize objects perfectly as they are and deserialize them on the other side regardless of what is stored in them. Even `Marshal` is error-prone and complains when certain conditions are not met. YASL aims to provide serialization similar to `Marshal`'s, albeit simpler and without complaining about unserializable objects. After all, 90% of the time, I don't care if a proc, binding, or singleton method got serialized or not. I just want the object containing them to get serialized successfully, and that is all I need.
+There are many Ruby serialization libraries out there, but none simply serialize objects perfectly as they are and deserialize them on the other side regardless of what is stored in them. Even `Marshal` is error-prone and complains when certain conditions are not met. YASL aims to provide serialization similar to Marshal's, albeit in pure Ruby and without complaining about unserializable objects. After all, 90% of the time, I don't care if a proc, binding, or singleton method got serialized or not. I just want the object containing them to get serialized successfully, and that is all I need.
 
 ## Assumptions
 
