@@ -284,6 +284,7 @@ RSpec.describe do
         
         expected_dump = JSON.dump(
           _class: car1.class.name,
+          _id: 1,
           _instance_variables: {
             make: car1.make,
             model: car1.model,
@@ -353,12 +354,14 @@ RSpec.describe do
         
         expected_dump = JSON.dump(
           _class: car2.class.name,
+          _id: 1,
           _instance_variables: {
             make: car2.make,
             model: car2.model,
             year: car2.year,
             owner: {
               _class: 'Driving::Person',
+              _id: 1,
               _instance_variables: {
                 name: person1.name,
                 dob: {
@@ -400,6 +403,7 @@ RSpec.describe do
         
         expected_dump = JSON.dump(
           _class: car_struct1.class.name,
+          _id: 1,
           _struct_member_values: {
             make: car_struct1.make,
             model: car_struct1.model,
@@ -458,9 +462,11 @@ RSpec.describe do
         
         expected_dump = JSON.dump(
           _class: car_struct2.class.name,
+          _id: 1,
           _instance_variables: {
             owner: {
               _class: 'Driving::Person',
+              _id: 1,
               _instance_variables: {
                 name: person1.name,
                 dob: {
@@ -495,6 +501,7 @@ RSpec.describe do
       
       expected_dump = JSON.dump(
         _class: person2.class.name,
+        _id: 1,
         _instance_variables: {
           name: person2.name,
           dob: {
@@ -506,6 +513,7 @@ RSpec.describe do
             _data: [
               {
                 _class: car3.class.name,
+                _id: 1,
                 _instance_variables: {
                   make: car3.make,
                   model: car3.model,
@@ -514,6 +522,7 @@ RSpec.describe do
               },
               {
                 _class: car4.class.name,
+                _id: 2,
                 _instance_variables: {
                   make: car4.make,
                   model: car4.model,
@@ -525,7 +534,7 @@ RSpec.describe do
         },
         _classes: [
           {
-            _class: person1.class.name,
+            _class: person2.class.name,
             _class_variables: {
               class_count: 1,
             },
@@ -552,6 +561,7 @@ RSpec.describe do
       
       expected_dump = JSON.dump(
         _class: person3.class.name,
+        _id: 1,
         _instance_variables: {
           name: person3.name,
           dob: {
@@ -563,6 +573,7 @@ RSpec.describe do
             _data: {
               car1: {
                 _class: car3.class.name,
+                _id: 1,
                 _instance_variables: {
                   make: car3.make,
                   model: car3.model,
@@ -571,6 +582,7 @@ RSpec.describe do
               },
               car2: {
                 _class: car4.class.name,
+                _id: 2,
                 _instance_variables: {
                   make: car4.make,
                   model: car4.model,
@@ -582,7 +594,7 @@ RSpec.describe do
         },
         _classes: [
           {
-            _class: person1.class.name,
+            _class: person3.class.name,
             _class_variables: {
               class_count: 1,
             },
@@ -604,20 +616,77 @@ RSpec.describe do
       expect(dump).to eq(expected_dump)
     end
     
-    xit 'serializes recursively with cycles' do
+    it 'serializes recursively with cycles' do
       dump = YASL.dump(person4)
       
       expected_dump = JSON.dump(
-      ''
+        _class: person4.class.name,
+        _id: 1,
+        _instance_variables: {
+          name: person4.name,
+          dob: {
+            _class: 'Time',
+            _data: person4.dob.to_datetime.marshal_dump
+          },
+          cars: {
+            _class: 'Array',
+            _data: [
+              {
+                _class: car3.class.name,
+                _id: 1,
+                _instance_variables: {
+                  make: car3.make,
+                  model: car3.model,
+                  year: car3.year,
+                  owner: {
+                    _class: person4.class.name,
+                    _id: 1,
+                  },
+                },
+              },
+              {
+                _class: car4.class.name,
+                _id: 2,
+                _instance_variables: {
+                  make: car4.make,
+                  model: car4.model,
+                  year: car4.year,
+                  owner: {
+                    _class: person4.class.name,
+                    _id: 1,
+                  },
+                },
+              },
+            ]
+          }
+        },
+        _classes: [
+          {
+            _class: person4.class.name,
+            _class_variables: {
+              class_count: 1,
+            },
+            _instance_variables: {
+              count: 1,
+            },
+          },
+          {
+            _class: car2.class.name,
+            _class_variables: {
+              class_count: 2,
+            },
+            _instance_variables: {
+              count: 2,
+            },
+          },
+        ],
       )
-      puts dump
       expect(dump).to eq(expected_dump)
     end
     
     it 'serializes direct class'
-    
     it 'serializes direct module'
-    
+    # TODO handle exception case of not needing to id class or module directly
   end
   
   describe '#load' do

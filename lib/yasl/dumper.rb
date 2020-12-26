@@ -1,10 +1,11 @@
 module YASL
   class Dumper
-    attr_reader :object, :classes #, :objects, :object_hash_map
+    attr_reader :object, :classes, :class_objects
     
     def initialize(object)
       @object = object
       @classes = []
+      @class_objects = {}
     end
     
     def dump(include_classes: true)
@@ -67,12 +68,18 @@ module YASL
     
     def dump_non_basic_data_type_structure(object)
       structure = {}
-      klass = object.is_a?(Class) ? object : object.class
+      klass = class_for(object)
       structure[:_class] = klass.name
       classes << klass unless classes.include?(klass)
-      structure.merge!(dump_class_variables(object))
-      structure.merge!(dump_instance_variables(object))
-      structure.merge!(dump_struct_member_values(object))
+      the_object_id = object_id(object)
+      if the_object_id.nil?
+        structure[:_id] = add_to_class_array(object) unless object.is_a?(Class) || object.is_a?(Module)
+        structure.merge!(dump_class_variables(object))
+        structure.merge!(dump_instance_variables(object))
+        structure.merge!(dump_struct_member_values(object))
+      else
+        structure[:_id] = the_object_id
+      end
       structure
     end
     
@@ -108,6 +115,25 @@ module YASL
         end
       end
       structure
+    end
+        
+    private
+    
+    def class_for(object)
+      object.is_a?(Class) ? object : object.class
+    end
+    
+    def object_id(object)
+      object_class_array = class_objects[class_for(object)]
+      object_class_array_index = object_class_array&.index(object)
+      (object_class_array_index + 1) unless object_class_array_index.nil?
+    end
+    
+    def add_to_class_array(object)
+      object_class = class_for(object)
+      class_objects[object_class] ||= []
+      class_objects[object_class] << object unless class_objects[object_class].include?(object)
+      class_objects[object_class].index(object) + 1
     end
         
   end
