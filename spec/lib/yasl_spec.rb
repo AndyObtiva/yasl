@@ -400,7 +400,7 @@ RSpec.describe do
         
         expected_dump = JSON.dump(
           _class: car_struct1.class.name,
-          _member_values: {
+          _struct_member_values: {
             make: car_struct1.make,
             model: car_struct1.model,
             year: car_struct1.year,
@@ -470,7 +470,7 @@ RSpec.describe do
               }
             }
           },
-          _member_values: {
+          _struct_member_values: {
             make: car_struct2.make,
             model: car_struct2.model,
             year: car_struct2.year,

@@ -1,5 +1,7 @@
 # YASL - Yet Another Serialization Library
 [![Ruby](https://github.com/AndyObtiva/yasl/workflows/Ruby/badge.svg)](https://github.com/AndyObtiva/yasl/actions?query=workflow%3ARuby)
+[![Coverage Status](https://coveralls.io/repos/github/AndyObtiva/yasl/badge.svg?branch=master)](https://coveralls.io/github/AndyObtiva/yasl?branch=master)
+[![Maintainability](https://api.codeclimate.com/v1/badges/e8d043b8c78c801f0aa3/maintainability)](https://codeclimate.com/github/AndyObtiva/yasl/maintainability)
 
 A Ruby serialization library that serializes/deserializes objects through their instance variables and Struct members by default without complaining about unserializable objects.
 

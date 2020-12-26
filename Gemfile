@@ -10,6 +10,7 @@ group :development do
   gem 'rdoc', '~> 3.12'
   gem 'bundler', '>= 1.0'
   gem 'juwelier', '~> 2.1.0'
-  gem 'simplecov', '>= 0'
+  gem 'simplecov', '~> 0.10.0'
+  gem 'coveralls', require: false
   gem 'puts_debuggerer', '>= 0'
 end
