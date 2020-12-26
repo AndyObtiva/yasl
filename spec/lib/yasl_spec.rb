@@ -278,16 +278,22 @@ RSpec.describe do
         
         expected_dump = JSON.dump(
           _class: 'Hash',
-          _data: {
-            {
-              _class: 'Symbol',
-              _data: 'key1',
-            } => 'value1',
-            {
-              _class: 'Symbol',
-              _data: 'key2',
-            } => 'value2',
-          }
+          _data: [
+            [
+              {
+                _class: 'Symbol',
+                _data: 'key1',
+              },
+              'value1'
+            ],
+            [
+              {
+                _class: 'Symbol',
+                _data: 'key2',
+              },
+              'value2'
+            ],
+          ]
         )
         expect(dump).to eq(expected_dump)
       end
@@ -591,26 +597,32 @@ RSpec.describe do
           },
           cars: {
             _class: 'Hash',
-            _data: {
-              car1: {
-                _class: car3.class.name,
-                _id: 1,
-                _instance_variables: {
-                  make: car3.make,
-                  model: car3.model,
-                  year: car3.year,
+            _data: [
+              [
+                'car1',
+                {
+                  _class: car3.class.name,
+                  _id: 1,
+                  _instance_variables: {
+                    make: car3.make,
+                    model: car3.model,
+                    year: car3.year,
+                  },
                 },
-              },
-              car2: {
-                _class: car4.class.name,
-                _id: 2,
-                _instance_variables: {
-                  make: car4.make,
-                  model: car4.model,
-                  year: car4.year,
+              ],
+              [
+                'car2',
+                {
+                  _class: car4.class.name,
+                  _id: 2,
+                  _instance_variables: {
+                    make: car4.make,
+                    model: car4.model,
+                    year: car4.year,
+                  },
                 },
-              },
-            }
+              ]
+            ]
           }
         },
         _classes: [
@@ -747,6 +759,8 @@ RSpec.describe do
       )
       expect(dump).to eq(expected_dump)
     end
+    
+    # TODO serialize whether every class is a class or module
   end
   
   describe '#load' do
@@ -785,7 +799,7 @@ RSpec.describe do
         expect(object).to eq(nil)
       end
       
-      xit 'deserializes Array Ruby basic data type' do
+      it 'deserializes Array Ruby basic data type' do
         array = ['a', 2, 44.4]
         object = YASL.load(JSON.dump(
           _class: 'Array',
@@ -795,30 +809,37 @@ RSpec.describe do
         expect(object).to eq(array)
       end
       
-      xit 'deserializes Hash Ruby basic data type' do
+      it 'deserializes Hash Ruby basic data type' do
         # TODO flip this serialize code to deserialize
         hash = {key1: 'value1', key2: 'value2'}
-        dump = YASL.dump(hash)
-        
-        expected_dump = JSON.dump(
+        object = YASL.load(JSON.dump(
           _class: 'Hash',
-          _data: {
-            {
-              _class: 'Symbol',
-              _data: 'key1',
-            } => 'value1',
-            {
-              _class: 'Symbol',
-              _data: 'key2',
-            } => 'value2',
-          }
-        )
-        expect(dump).to eq(expected_dump)
+          _data: [
+            [
+              {
+                _class: 'Symbol',
+                _data: 'key1',
+              },
+              'value1',
+            ],
+            [
+              {
+                _class: 'Symbol',
+                _data: 'key2',
+              },
+              'value2',
+            ],
+          ]
+        ))
+        
+        expect(object).to eq(hash)
       end
     end
   
     xit 'deserializes basic object (no nesting)'
     xit 'deserializes object recursively'
     xit 'deserializes object recursively with cycles'
+    xit 'exception case for deserialize not finding a class'
+    xit 'materialize a class matching a non-existing class'
   end
 end

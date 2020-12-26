@@ -3,17 +3,14 @@
 [![Coverage Status](https://coveralls.io/repos/github/AndyObtiva/yasl/badge.svg?branch=master)](https://coveralls.io/github/AndyObtiva/yasl?branch=master)
 [![Maintainability](https://api.codeclimate.com/v1/badges/e8d043b8c78c801f0aa3/maintainability)](https://codeclimate.com/github/AndyObtiva/yasl/maintainability)
 
-A Ruby alternative serialization library to Marshal that serializes without complaining about unserializable objects.
-
-## Background
-
-There are many Ruby serialization libraries out there, but none simply serialize objects perfectly as they are and deserialize them on the other side regardless of what is stored in them. Even `Marshal` is error-prone and complains when certain conditions are not met. YASL aims to provide serialization similar to Marshal's, albeit in pure Ruby and without complaining about unserializable objects. After all, 90% of the time, I don't care if a proc, binding, or singleton method got serialized or not. I just want the object containing them to get serialized successfully, and that is all I need.
+A pure Ruby serialization library that works in Opal Ruby as an alternative to YAML/Marshal.
 
 ## Assumptions
 
-- Both the server and client contain the same Ruby classes
+- Portablity across Ruby flavors (e.g. Opal)
 - Zero configuration. Developers are too busy solving business domain problems to worry about low-level serialization details.
 - Silently ignore all that is not serializable like Proc, Binding, and IO objects
+- Support serializing classes and modules, not just object instances
 - JSON is good enough. No need for premature optimization.
 
 ## Usage Instructions
@@ -81,7 +78,7 @@ puts dump.inspect
 
 ### Deserialize
 
-[DESERIALIZE NOT YET IMPLEMENTED]
+[DESERIALIZE NOT FULLY IMPLEMENTED]
 
 To deserialize, use the `YASL#load` method.
 

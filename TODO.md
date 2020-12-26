@@ -5,12 +5,13 @@
 - Deserialize instance variables as JSON
 - Deserialize Struct members as JSON
 - Deserialize class variables as JSON
+- Deserialize direct Class occurence in variables as JSON
+- Deserialize direct Module occurence in variables as JSON
 - Deal with bypassing constructor args (perhaps providing an alternative to new)
+- Materialize a class matching the non-existing class
 
 ## Soon
 
-- Serialize/Deserialize direct Class occurence in variables as JSON
-- Serialize/Deserialize direct Module occurence in variables as JSON
 
 ## Far Off
     

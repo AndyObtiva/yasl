@@ -30,6 +30,7 @@ module YASL
   JSON_BASIC_DATA_TYPES = [NilClass, String, Integer, Float, TrueClass, FalseClass]
   RUBY_ONLY_BASIC_DATA_TYPES = [Time, Date, Complex, Rational, Regexp, Symbol, Set, Range, Array, Hash]
   RUBY_BASIC_DATA_TYPES = RUBY_ONLY_BASIC_DATA_TYPES + JSON_BASIC_DATA_TYPES
+  RESERVED_KEYS = []
   
   class << self
     def dump(object, include_classes: true)

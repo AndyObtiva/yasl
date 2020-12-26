@@ -19,7 +19,6 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-# TODO alias initialize on every class loaded to bypass argument requirements
 module YASL
   class Loader
     attr_reader :structure
@@ -71,7 +70,7 @@ module YASL
 #       when Complex, Rational, Regexp, Symbol
 #         object.to_s
       when 'Symbol'
-        data.to_s
+        data.to_sym
 #       when Set
 #         object.to_a
 #       when Range

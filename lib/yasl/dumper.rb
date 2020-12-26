@@ -84,9 +84,7 @@ module YASL
       when Array
         object.map {|element| dump_structure(element)}
       when Hash
-        object.reduce({}) do |new_hash, pair|
-          new_hash.merge(dump_structure(pair.first) => dump_structure(pair.last))
-        end
+        object.map {|pair| pair.map {|element| dump_structure(element)}}
       end
     end
     
