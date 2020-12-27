@@ -13,4 +13,5 @@ group :development do
   gem 'simplecov', '~> 0.10.0'
   gem 'coveralls', require: false
   gem 'puts_debuggerer', '>= 0'
+  gem 'equalizer', '>= 0'
 end

@@ -11,6 +11,10 @@ class Car
       @count += 1
     end
     
+    def count
+      @count
+    end
+    
     def reset_class_count!
       @@class_count = 0
     end
@@ -19,25 +23,33 @@ class Car
       @@class_count = 0 unless defined?(@@class_count)
       @@class_count += 1
     end
+    
+    def class_count
+      @class_count
+    end
   end
   
-  attr_accessor :make,
-                :model,
-                :year,
-                :registration_time,
-                :registration_date,
-                :registration_date_time,
-                :complex_number,
-                :complex_polar_number,
-                :rational_number,
-                :regex,
-                :symbol,
-                :set,
-                :range,
-                :range_exclusive,
-                :class_attribute,
-                :module_attribute,
-                :owner
+  ATTRIBUTES = [
+    :make,
+    :model,
+    :year,
+    :registration_time,
+    :registration_date,
+    :registration_date_time,
+    :complex_number,
+    :complex_polar_number,
+    :rational_number,
+    :regex,
+    :symbol,
+    :set,
+    :range,
+    :range_exclusive,
+    :class_attribute,
+    :module_attribute,
+    :owner
+  ]
+  attr_accessor *ATTRIBUTES
+  include Equalizer.new(*ATTRIBUTES)
   
   def initialize
     self.class.increment_count!
@@ -97,7 +109,9 @@ module Driving
       end
     end
     
-    attr_accessor :name, :dob, :cars
+    ATTRIBUTES = [:name, :dob, :cars]
+    attr_accessor *ATTRIBUTES
+    include Equalizer.new(*ATTRIBUTES)
     
     def initialize
       self.class.increment_count!
@@ -119,7 +133,7 @@ RSpec.describe do
       car.complex_number = Complex(2,37)
       car.complex_polar_number = Complex.polar(-23,28)
       car.rational_number = Rational(22/7)
-      car.regex = /^[a-z][1-9]$/
+      car.regex = Regexp.new(/^[a-z][1-9]$/.to_s)
       car.symbol = :good
       car.set = Set.new([1, 'b', 3.7])
       car.range = (1..7)
@@ -810,7 +824,6 @@ RSpec.describe do
       end
       
       it 'deserializes Hash Ruby basic data type' do
-        # TODO flip this serialize code to deserialize
         hash = {key1: 'value1', key2: 'value2'}
         object = YASL.load(JSON.dump(
           _class: 'Hash',
@@ -833,6 +846,87 @@ RSpec.describe do
         ))
         
         expect(object).to eq(hash)
+      end
+    end
+    
+    context 'Ruby objects and basic data types' do
+      it 'serializes instance variables of all Ruby basic data types' do
+        car1
+        
+        object = YASL.load(JSON.dump(
+          _class: car1.class.name,
+          _id: 1,
+          _instance_variables: {
+            make: car1.make,
+            model: car1.model,
+            year: car1.year,
+            registration_time: {
+              _class: 'Time',
+              _data: car1.registration_time.to_datetime.marshal_dump
+            },
+            registration_date: {
+              _class: 'Date',
+              _data: car1.registration_date.marshal_dump
+            },
+            registration_date_time: {
+              _class: 'DateTime',
+              _data: car1.registration_date_time.marshal_dump
+            },
+            complex_number: {
+              _class: 'Complex',
+              _data: car1.complex_number.to_s
+            },
+            complex_polar_number: {
+              _class: 'Complex',
+              _data: car1.complex_polar_number.to_s
+            },
+            rational_number: {
+              _class: 'Rational',
+              _data: car1.rational_number.to_s
+            },
+            regex: {
+              _class: 'Regexp',
+              _data: car1.regex.to_s
+            },
+            symbol: {
+              _class: 'Symbol',
+              _data: car1.symbol.to_s
+            },
+            set: {
+              _class: 'Set',
+              _data: car1.set.to_a
+            },
+            range: {
+              _class: 'Range',
+              _data: [car1.range.begin, car1.range.end, car1.range.exclude_end?]
+            },
+            range_exclusive: {
+              _class: 'Range',
+              _data: [car1.range_exclusive.begin, car1.range_exclusive.end, car1.range_exclusive.exclude_end?]
+            },
+            class_attribute: {
+              _class: 'Car',
+            },
+            module_attribute: {
+              _class: 'Driving',
+            },
+          },
+          _classes: [
+            {
+              _class: car2.class.name,
+              _class_variables: {
+                class_count: 1,
+              },
+              _instance_variables: {
+                count: 1,
+              },
+            },
+          ],
+        ))
+        
+        expect(object).to eq(car1)
+#         expect(Car.count).to eq(1)
+#         expect(Car.class_count).to eq(1)
       end
     end
   

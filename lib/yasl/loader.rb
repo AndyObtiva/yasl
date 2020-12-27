@@ -21,21 +21,83 @@
 
 module YASL
   class Loader
-    attr_reader :structure
+    attr_reader :structure, :classes, :class_objects
     
     def initialize(structure)
       @structure = structure
+      @classes = []
+      @class_objects = {}
     end
   
     def load
-      load_structure(structure)
+      pd load_structure(structure)
     end
     
-    def load_structure(structure)
+    def load_structure(structure, for_classes: false)
+      pd structure
       if YASL.json_basic_data_type?(structure) && !(structure.is_a?(String) && structure.start_with?('_'))
+        pd 1
         structure
-      elsif structure['_data']
-        load_ruby_basic_data_type(structure['_class'], structure['_data'])
+      elsif (structure['_class'] && (structure['_data'] || !structure.keys.detect {|key| key.start_with?('_') && key != '_class'} ))
+        pd 2
+        load_ruby_basic_data_type_object(structure['_class'], structure['_data'])
+      elsif structure['_class'] && structure['_instance_variables']
+        pd 3
+        load_non_basic_data_type_object(structure)
+      end
+    end
+    
+    private
+    
+    def load_non_basic_data_type_object(structure)
+      class_name = structure['_class']
+      pd class_name
+      klass = class_for(class_name)
+      pd klass
+      add_to_classes(klass)
+      klass.alias_method(:initialize_without_yasl, :initialize)
+      object = klass.new
+      add_to_class_array(object)
+      pd structure['_instance_variables']
+      structure['_instance_variables'].each do |instance_var, value|
+        value = load_structure(value)
+        pd instance_var, value
+        object.instance_variable_set("@#{instance_var}".to_sym, value)
+        pd object
+      end
+      object
+    ensure
+      klass.define_method(:initialize, klass.instance_method(:initialize_without_yasl))
+    end
+    
+    def load_ruby_basic_data_type_object(class_name, data)
+      case class_name
+      when 'Time'
+        DateTime.new.marshal_load(data.map(&:to_r)).to_time
+      when 'Date'
+        Date.new.marshal_load(data.map(&:to_r))
+      when 'DateTime'
+        DateTime.new.marshal_load(data.map(&:to_r))
+      when 'Complex'
+        Complex(data)
+      when 'Rational'
+        Rational(data)
+      when 'Regexp'
+        Regexp.new(data)
+      when 'Symbol'
+        data.to_sym
+      when 'Set'
+        Set.new(data)
+      when 'Range'
+        Range.new(*data)
+      when 'Array'
+        data.map {|element| load_structure(element)}
+      when 'Hash'
+        data.reduce({}) do |new_hash, pair|
+          new_hash.merge(load_structure(pair.first) => load_structure(pair.last))
+        end
+      else
+        class_for(class_name)
       end
     end
     
@@ -52,36 +114,32 @@ module YASL
       puts "Class #{class_name} does not exist! YASL expects the same classes used for serialization to exist during deserialization."
     end
     
-#     def load_object(class_name, data: nil)
-#       klass = class_for(class_name)
-#       klass.alias_method(:initialize_without_yasl, :initialize)
-#       object = klass.new
-#       load_ruby_basic_data_type(object, data) unless data.nil?
-#     ensure
-#       klass.define_method(:initialize, klass.instance_method(:initialize_without_yasl))
+    def top_level_class?(object, for_classes)
+      (object.is_a?(Class) || object.is_a?(Module)) && !for_classes
+    end
+    
+    def add_to_classes(object)
+      classes << object unless classes.include?(object)
+    end
+    
+    # TODO rename object_id to something else to avoid conflict with Ruby
+    def object_id(object)
+      object_class_array = class_objects[class_for(object)]
+      object_class_array_index = object_class_array&.index(object)
+      (object_class_array_index + 1) unless object_class_array_index.nil?
+    end
+    
+#     def object_for_id(klass, klass_object_id)
+#       object_class_array = class_objects[klass]
+#       object_class_array&.[](klass_object_id - 1)
 #     end
     
-    def load_ruby_basic_data_type(class_name, data)
-      case class_name
-#       when Time
-#         object.to_datetime.marshal_dump
-#       when Date
-#         object.marshal_dump
-#       when Complex, Rational, Regexp, Symbol
-#         object.to_s
-      when 'Symbol'
-        data.to_sym
-#       when Set
-#         object.to_a
-#       when Range
-#         [object.begin, object.end, object.exclude_end?]
-      when 'Array'
-        data.map {|element| load_structure(element)}
-      when 'Hash'
-        data.reduce({}) do |new_hash, pair|
-          new_hash.merge(load_structure(pair.first) => load_structure(pair.last))
-        end
-      end
+    def add_to_class_array(object)
+      object_class = class_for(object)
+      class_objects[object_class] ||= []
+      class_objects[object_class] << object unless class_objects[object_class].include?(object)
+      class_objects[object_class].index(object) + 1
     end
+            
   end
 end
