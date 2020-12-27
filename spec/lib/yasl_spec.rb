@@ -135,7 +135,7 @@ RSpec.describe do
       car.rational_number = Rational(22/7)
       car.regex = Regexp.new(/^[a-z][1-9]$/.to_s)
       car.symbol = :good
-      car.set = Set.new([1, 'b', 3.7])
+      car.set = Set.new([1, :b, 3.7])
       car.range = (1..7)
       car.range_exclusive = (1...7)
       car.class_attribute = Car
@@ -181,7 +181,7 @@ RSpec.describe do
       car.rational_number = Rational(22/7)
       car.regex = /^[a-z][1-9]$/
       car.symbol = :good
-      car.set = Set.new([1, 'b', 3.7])
+      car.set = Set.new([1, :b, 3.7])
       car.range = (1..7)
       car.range_exclusive = (1...7)
     end
@@ -358,7 +358,14 @@ RSpec.describe do
             },
             set: {
               _class: 'Set',
-              _data: car1.set.to_a
+              _data: [
+                1,
+                {
+                  :_class => "Symbol",
+                  :_data => "b"
+                },
+                3.7
+              ]
             },
             range: {
               _class: 'Range',
@@ -483,7 +490,14 @@ RSpec.describe do
             },
             set: {
               _class: 'Set',
-              _data: car_struct1.set.to_a
+              _data: [
+                1,
+                {
+                  :_class => "Symbol",
+                  :_data => "b"
+                },
+                3.7
+              ]
             },
             range: {
               _class: 'Range',
@@ -894,7 +908,14 @@ RSpec.describe do
             },
             set: {
               _class: 'Set',
-              _data: car1.set.to_a
+              _data: [
+                1,
+                {
+                  :_class => "Symbol",
+                  :_data => "b"
+                },
+                3.7
+              ]
             },
             range: {
               _class: 'Range',

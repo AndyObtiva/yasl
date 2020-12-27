@@ -78,7 +78,7 @@ module YASL
       when Complex, Rational, Regexp, Symbol
         object.to_s
       when Set
-        object.to_a
+        object.to_a.map {|element| dump_structure(element)}
       when Range
         [object.begin, object.end, object.exclude_end?]
       when Array

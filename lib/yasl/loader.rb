@@ -30,19 +30,15 @@ module YASL
     end
   
     def load
-      pd load_structure(structure)
+      load_structure(structure)
     end
     
     def load_structure(structure, for_classes: false)
-      pd structure
       if YASL.json_basic_data_type?(structure) && !(structure.is_a?(String) && structure.start_with?('_'))
-        pd 1
         structure
       elsif (structure['_class'] && (structure['_data'] || !structure.keys.detect {|key| key.start_with?('_') && key != '_class'} ))
-        pd 2
         load_ruby_basic_data_type_object(structure['_class'], structure['_data'])
       elsif structure['_class'] && structure['_instance_variables']
-        pd 3
         load_non_basic_data_type_object(structure)
       end
     end
@@ -51,19 +47,14 @@ module YASL
     
     def load_non_basic_data_type_object(structure)
       class_name = structure['_class']
-      pd class_name
       klass = class_for(class_name)
-      pd klass
       add_to_classes(klass)
       klass.alias_method(:initialize_without_yasl, :initialize)
       object = klass.new
       add_to_class_array(object)
-      pd structure['_instance_variables']
       structure['_instance_variables'].each do |instance_var, value|
         value = load_structure(value)
-        pd instance_var, value
         object.instance_variable_set("@#{instance_var}".to_sym, value)
-        pd object
       end
       object
     ensure
@@ -87,7 +78,7 @@ module YASL
       when 'Symbol'
         data.to_sym
       when 'Set'
-        Set.new(data)
+        Set.new(data.map {|element| load_structure(element)})
       when 'Range'
         Range.new(*data)
       when 'Array'
