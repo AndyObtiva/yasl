@@ -29,7 +29,7 @@ module YASL
       @class_objects = {}
     end
     
-    def dump(include_classes: true)
+    def dump(include_classes: false)
       structure = dump_structure(object)
       structure.merge!(dump_classes_structure(object)) if include_classes && structure.is_a?(Hash)
       structure

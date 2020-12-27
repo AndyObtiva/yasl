@@ -33,7 +33,7 @@ module YASL
   RESERVED_KEYS = []
   
   class << self
-    def dump(object, include_classes: true)
+    def dump(object, include_classes: false)
       JSON.dump(Dumper.new(object).dump(include_classes: include_classes))
     end
     

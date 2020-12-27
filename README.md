@@ -41,7 +41,7 @@ require 'yasl'
 
 To serialize, use the `YASL#dump` method.
 
-Example (from [samples/sample.rb](samples/sample.rb)):
+Example (from [samples/basic.rb](samples/basic.rb)):
 
 ```ruby
 require 'yasl'
@@ -75,6 +75,139 @@ puts dump.inspect
 
 # => "{\"_class\":\"Car\",\"_id\":1,\"_instance_variables\":{\"make\":\"Mitsubishi\",\"model\":\"Eclipse\",\"year\":\"2002\",\"registration_time\":{\"_class\":\"Time\",\"_data\":[0,2452932,49177,\"12644383719423828125/137438953472\",-10800,2299161.0]},\"registration_date\":{\"_class\":\"Date\",\"_data\":[0,2452932,0,0,0,2299161.0]},\"registration_date_time\":{\"_class\":\"DateTime\",\"_data\":[0,2452932,49177,92000000,-10800,2299161.0]},\"complex_number\":{\"_class\":\"Complex\",\"_data\":\"2+37i\"},\"complex_polar_number\":{\"_class\":\"Complex\",\"_data\":\"22.13993492521203-6.230833131080988i\"},\"rational_number\":{\"_class\":\"Rational\",\"_data\":\"3/1\"}}}"
 ```
+
+#### Cycles
+
+YASL automatically detects cycles when serializing bidirectional object references.
+
+Example (from [samples/cycle.rb](samples/cycle.rb)):
+
+```ruby
+$LOAD_PATH.unshift File.expand_path(File.join(__dir__, '..', 'lib'))
+
+require 'yasl'
+
+class Car
+  attr_accessor :make,
+                :model,
+                :year,
+                :owner
+end
+
+class Person
+  class << self
+    def reset_count!
+      @count = 0
+    end
+    
+    def increment_count!
+      @count ||= 0
+      @count += 1
+    end
+    
+    def reset_class_count!
+      @@class_count = 0
+    end
+    
+    def increment_class_count!
+      @@class_count = 0 unless defined?(@@class_count)
+      @@class_count += 1
+    end
+  end
+  
+  attr_accessor :name, :dob, :cars
+  
+  def initialize
+    self.class.increment_count!
+    self.class.increment_class_count!
+  end
+end
+
+person = Person.new
+person.name = 'Sean Hux'
+person.dob = Time.new(2017, 10, 17, 10, 3, 4)
+
+car = Car.new
+car.make = 'Mitsubishi'
+car.model = 'Eclipse'
+car.year = '2002'
+
+car.owner = person
+person.cars = [car]
+
+dump = YASL.dump(car)
+
+puts dump.inspect
+
+# => "{\"_class\":\"Car\",\"_id\":1,\"_instance_variables\":{\"make\":\"Mitsubishi\",\"model\":\"Eclipse\",\"owner\":{\"_class\":\"Person\",\"_id\":1,\"_instance_variables\":{\"cars\":{\"_class\":\"Array\",\"_data\":[{\"_class\":\"Car\",\"_id\":1}]},\"dob\":{\"_class\":\"Time\",\"_data\":[0,2458044,50584,0,-14400,2299161.0]},\"name\":\"Sean Hux\"}},\"year\":\"2002\"}}"
+```
+
+#### `include_classes` option
+
+(default: `false`)
+
+Passing `include_classes: true` to the `YASL#dump` method causes YASL to serialize classes and modules too (class variables and singleton class instance variables). They go under the `_classes` JSON array.
+
+Example (from [samples/include_classes.rb](samples/include_classes.rb)):
+
+```ruby
+$LOAD_PATH.unshift File.expand_path(File.join(__dir__, '..', 'lib'))
+
+require 'yasl'
+
+class Car
+  attr_accessor :make,
+                :model,
+                :year,
+                :owner
+end
+
+class Person
+  class << self
+    def reset_count!
+      @count = 0
+    end
+    
+    def increment_count!
+      @count ||= 0
+      @count += 1
+    end
+    
+    def reset_class_count!
+      @@class_count = 0
+    end
+    
+    def increment_class_count!
+      @@class_count = 0 unless defined?(@@class_count)
+      @@class_count += 1
+    end
+  end
+  
+  attr_accessor :name, :dob
+  
+  def initialize
+    self.class.increment_count!
+    self.class.increment_class_count!
+  end
+end
+
+person = Person.new
+person.name = 'Sean Hux'
+person.dob = Time.new(2017, 10, 17, 10, 3, 4)
+
+car = Car.new
+car.make = 'Mitsubishi'
+car.model = 'Eclipse'
+car.year = '2002'
+car.owner = person
+
+dump = YASL.dump(car, include_classes: true)
+
+puts dump.inspect
+
+# => "{\"_class\":\"Car\",\"_id\":1,\"_instance_variables\":{\"make\":\"Mitsubishi\",\"model\":\"Eclipse\",\"owner\":{\"_class\":\"Person\",\"_id\":1,\"_instance_variables\":{\"dob\":{\"_class\":\"Time\",\"_data\":[0,2458044,50584,0,-14400,2299161.0]},\"name\":\"Sean Hux\"}},\"year\":\"2002\"},\"_classes\":[{\"_class\":\"Person\",\"_class_variables\":{\"class_count\":1},\"_instance_variables\":{\"count\":1}}]}"
+```
+
 
 ### Deserialize
 
