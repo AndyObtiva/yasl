@@ -9,3 +9,6 @@
 - Serialize struct member values as JSON
 - Serialize classes/modules as JSON
 - Serialize cycles by using object ID references
+- Deserialize instance variables as JSON
+- Deserialize Class occurence in variables as JSON
+- Deserialize Module occurence in variables as JSON

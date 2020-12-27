@@ -321,20 +321,8 @@ RSpec.describe do
           _class: car1.class.name,
           _id: 1,
           _instance_variables: {
-            make: car1.make,
-            model: car1.model,
-            year: car1.year,
-            registration_time: {
-              _class: 'Time',
-              _data: car1.registration_time.to_datetime.marshal_dump
-            },
-            registration_date: {
-              _class: 'Date',
-              _data: car1.registration_date.marshal_dump
-            },
-            registration_date_time: {
-              _class: 'DateTime',
-              _data: car1.registration_date_time.marshal_dump
+            class_attribute: {
+              _class: 'Car',
             },
             complex_number: {
               _class: 'Complex',
@@ -344,6 +332,19 @@ RSpec.describe do
               _class: 'Complex',
               _data: car1.complex_polar_number.to_s
             },
+            make: car1.make,
+            model: car1.model,
+            module_attribute: {
+              _class: 'Driving',
+            },
+            range: {
+              _class: 'Range',
+              _data: [car1.range.begin, car1.range.end, car1.range.exclude_end?]
+            },
+            range_exclusive: {
+              _class: 'Range',
+              _data: [car1.range_exclusive.begin, car1.range_exclusive.end, car1.range_exclusive.exclude_end?]
+            },
             rational_number: {
               _class: 'Rational',
               _data: car1.rational_number.to_s
@@ -352,9 +353,17 @@ RSpec.describe do
               _class: 'Regexp',
               _data: car1.regex.to_s
             },
-            symbol: {
-              _class: 'Symbol',
-              _data: car1.symbol.to_s
+            registration_date: {
+              _class: 'Date',
+              _data: car1.registration_date.marshal_dump
+            },
+            registration_date_time: {
+              _class: 'DateTime',
+              _data: car1.registration_date_time.marshal_dump
+            },
+            registration_time: {
+              _class: 'Time',
+              _data: car1.registration_time.to_datetime.marshal_dump
             },
             set: {
               _class: 'Set',
@@ -367,20 +376,11 @@ RSpec.describe do
                 3.7
               ]
             },
-            range: {
-              _class: 'Range',
-              _data: [car1.range.begin, car1.range.end, car1.range.exclude_end?]
+            symbol: {
+              _class: 'Symbol',
+              _data: car1.symbol.to_s
             },
-            range_exclusive: {
-              _class: 'Range',
-              _data: [car1.range_exclusive.begin, car1.range_exclusive.end, car1.range_exclusive.exclude_end?]
-            },
-            class_attribute: {
-              _class: 'Car',
-            },
-            module_attribute: {
-              _class: 'Driving',
-            },
+            year: car1.year,
           },
           _classes: [
             {
@@ -406,18 +406,18 @@ RSpec.describe do
           _instance_variables: {
             make: car2.make,
             model: car2.model,
-            year: car2.year,
             owner: {
               _class: 'Driving::Person',
               _id: 1,
               _instance_variables: {
-                name: person1.name,
                 dob: {
                   _class: 'Time',
                   _data: person1.dob.to_datetime.marshal_dump
-                }
+                },
+                name: person1.name,
               }
-            }
+            },
+            year: car2.year,
           },
           _classes: [
             {
@@ -523,11 +523,11 @@ RSpec.describe do
               _class: 'Driving::Person',
               _id: 1,
               _instance_variables: {
-                name: person1.name,
                 dob: {
                   _class: 'Time',
                   _data: person1.dob.to_datetime.marshal_dump
-                }
+                },
+                name: person1.name,
               }
             }
           },
@@ -558,11 +558,6 @@ RSpec.describe do
         _class: person2.class.name,
         _id: 1,
         _instance_variables: {
-          name: person2.name,
-          dob: {
-            _class: 'Time',
-            _data: person2.dob.to_datetime.marshal_dump
-          },
           cars: {
             _class: 'Array',
             _data: [
@@ -585,7 +580,12 @@ RSpec.describe do
                 },
               },
             ]
-          }
+          },
+          dob: {
+            _class: 'Time',
+            _data: person2.dob.to_datetime.marshal_dump
+          },
+          name: person2.name,
         },
         _classes: [
           {
@@ -618,11 +618,6 @@ RSpec.describe do
         _class: person3.class.name,
         _id: 1,
         _instance_variables: {
-          name: person3.name,
-          dob: {
-            _class: 'Time',
-            _data: person3.dob.to_datetime.marshal_dump
-          },
           cars: {
             _class: 'Hash',
             _data: [
@@ -651,7 +646,12 @@ RSpec.describe do
                 },
               ]
             ]
-          }
+          },
+          dob: {
+            _class: 'Time',
+            _data: person3.dob.to_datetime.marshal_dump
+          },
+          name: person3.name,
         },
         _classes: [
           {
@@ -684,11 +684,6 @@ RSpec.describe do
         _class: person4.class.name,
         _id: 1,
         _instance_variables: {
-          name: person4.name,
-          dob: {
-            _class: 'Time',
-            _data: person4.dob.to_datetime.marshal_dump
-          },
           cars: {
             _class: 'Array',
             _data: [
@@ -698,11 +693,11 @@ RSpec.describe do
                 _instance_variables: {
                   make: car3.make,
                   model: car3.model,
-                  year: car3.year,
                   owner: {
                     _class: person4.class.name,
                     _id: 1,
                   },
+                  year: car3.year,
                 },
               },
               {
@@ -711,15 +706,20 @@ RSpec.describe do
                 _instance_variables: {
                   make: car4.make,
                   model: car4.model,
-                  year: car4.year,
                   owner: {
                     _class: person4.class.name,
                     _id: 1,
                   },
+                  year: car4.year,
                 },
               },
             ]
-          }
+          },
+          dob: {
+            _class: 'Time',
+            _data: person4.dob.to_datetime.marshal_dump
+          },
+          name: person4.name,
         },
         _classes: [
           {

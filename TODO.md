@@ -2,13 +2,15 @@
 
 ## Next
 
-- Deserialize instance variables as JSON
+- Deserialize classes and modules
 - Deserialize Struct members as JSON
 - Deserialize class variables as JSON
-- Deserialize direct Class occurence in variables as JSON
-- Deserialize direct Module occurence in variables as JSON
+- Deserialize top-level Class occurence in variables as JSON
+- Deserialize top-level Module occurence in variables as JSON
 - Deal with bypassing constructor args (perhaps providing an alternative to new)
 - Materialize a class matching the non-existing class
+- Support `include_classes` option on both dump and load
+- Support passing `whitelist_classes` to filter by upon load
 
 ## Soon
 

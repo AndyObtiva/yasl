@@ -3,15 +3,15 @@
 [![Coverage Status](https://coveralls.io/repos/github/AndyObtiva/yasl/badge.svg?branch=master)](https://coveralls.io/github/AndyObtiva/yasl?branch=master)
 [![Maintainability](https://api.codeclimate.com/v1/badges/e8d043b8c78c801f0aa3/maintainability)](https://codeclimate.com/github/AndyObtiva/yasl/maintainability)
 
-A pure Ruby serialization library that works in Opal Ruby as an alternative to YAML/Marshal.
+A pure Ruby serialization library that works across different Ruby implementations like Opal and JRuby as an alternative to YAML/Marshal.
 
-## Assumptions
+## Requirements
 
-- Portablity across Ruby flavors (e.g. Opal)
+- Portablity across different Ruby implementations, especially Opal and JRuby.
 - Zero configuration. Developers are too busy solving business domain problems to worry about low-level serialization details.
-- Silently ignore all that is not serializable like Proc, Binding, and IO objects
-- Support serializing classes and modules, not just object instances
-- JSON is good enough. No need for premature optimization.
+- Silently ignore non-serializable objects like `Proc`, `Binding`, and `IO`.
+- Support serializing classes and modules, not just object instances.
+- JSON encoding is good enough. No need for premature optimization.
 
 ## Usage Instructions
 
