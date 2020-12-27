@@ -159,7 +159,6 @@ module YASL
       classes << object unless classes.include?(object)
     end
     
-    # TODO rename object_id to something else to avoid conflict with Ruby
     def object_id(object)
       object_class_array = class_objects[class_for(object)]
       object_class_array_index = object_class_array&.index(object)

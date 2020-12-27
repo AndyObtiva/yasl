@@ -208,7 +208,6 @@ puts dump.inspect
 # => "{\"_class\":\"Car\",\"_id\":1,\"_instance_variables\":{\"make\":\"Mitsubishi\",\"model\":\"Eclipse\",\"owner\":{\"_class\":\"Person\",\"_id\":1,\"_instance_variables\":{\"dob\":{\"_class\":\"Time\",\"_data\":[0,2458044,50584,0,-14400,2299161.0]},\"name\":\"Sean Hux\"}},\"year\":\"2002\"},\"_classes\":[{\"_class\":\"Person\",\"_class_variables\":{\"class_count\":1},\"_instance_variables\":{\"count\":1}}]}"
 ```
 
-
 ### Deserialize
 
 [DESERIALIZE NOT FULLY IMPLEMENTED]
