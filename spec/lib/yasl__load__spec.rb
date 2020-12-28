@@ -538,8 +538,8 @@ RSpec.describe do
       
       object = YASL.load(data, include_classes: false)
       expect(object).to eq(person2)
-      expect(Car.count).to_not eq(1)
-      expect(Car.class_count).to_not eq(1)
+      expect(Car.count).to_not eq(2)
+      expect(Car.class_count).to_not eq(2)
       expect(Driving::Person.count).to_not eq(1)
       expect(Driving::Person.class_count).to_not eq(1)
       
@@ -724,6 +724,58 @@ RSpec.describe do
       expect(Driving::Person.class_count).to eq(1)
     end
       
-    xit 'exception case for deserialize not finding a class'
+    context 'top-level classes and modules' do
+      it 'deserializes class (adding to classes)' do
+        data = JSON.dump(
+          _class: 'Car',
+          _classes: [
+            {
+              _class: 'Car',
+              _class_variables: {
+                class_count: 4,
+              },
+              _instance_variables: {
+                count: 4,
+              },
+            }
+          ]
+        )
+        object = YASL.load(data, include_classes: false)
+        expect(object).to eq(Car)
+        expect(Car.count).to_not eq(4)
+        expect(Car.class_count).to_not eq(4)
+        
+        object = YASL.load(data, include_classes: true)
+        expect(object).to eq(Car)
+        expect(Car.count).to eq(4)
+        expect(Car.class_count).to eq(4)
+      end
+      
+      it 'deserializes module (adding to classes since the module singleton class is a class)' do
+        data = JSON.dump(
+          _class: 'Driving',
+          _classes: [
+            {
+              _class: 'Driving',
+              _instance_variables: {
+                var: 'var value',
+              },
+            }
+          ]
+        )
+        
+        object = YASL.load(data, include_classes: false)
+        expect(object).to eq(Driving)
+        expect(Driving.var).to_not eq('var value')
+        
+        object = YASL.load(data, include_classes: true)
+        expect(object).to eq(Driving)
+        expect(Driving.var).to eq('var value')
+      end
+    end
+    
+    xit 'raises error when deserializing data with a class that is not found' do
+    end
+    
   end
 end

@@ -5,18 +5,18 @@ GEM
       public_suffix (>= 2.0.2, < 5.0)
     awesome_print (1.8.0)
     builder (3.2.4)
-    coveralls (0.7.2)
-      multi_json (~> 1.3)
-      rest-client (= 1.6.7)
-      simplecov (>= 0.7)
-      term-ansicolor (= 1.2.2)
-      thor (= 0.18.1)
+    coveralls (0.8.23)
+      json (>= 1.8, < 3)
+      simplecov (~> 0.16.1)
+      term-ansicolor (~> 1.3)
+      thor (>= 0.19.4, < 2.0)
+      tins (~> 1.6)
     descendants_tracker (0.0.4)
       thread_safe (~> 0.3, >= 0.3.1)
     diff-lcs (1.4.4)
     docile (1.3.4)
     equalizer (0.0.11)
-    faraday (1.1.0)
+    faraday (1.2.0)
       multipart-post (>= 1.2, < 3)
       ruby2_keywords
     git (1.7.0)
@@ -29,8 +29,8 @@ GEM
       oauth2 (~> 1.0)
     hashie (3.6.0)
     highline (2.0.3)
-    json (1.8.6)
-    json (1.8.6-java)
+    json (2.5.1)
+    json (2.5.1-java)
     juwelier (2.1.3)
       builder
       bundler (>= 1.13)
@@ -42,9 +42,6 @@ GEM
       rdoc
       semver
     jwt (2.2.2)
-    mime-types (3.3.1)
-      mime-types-data (~> 3.2015)
-    mime-types-data (3.2020.1104)
     mini_portile2 (2.4.0)
     multi_json (1.15.0)
     multi_xml (0.6.0)
@@ -64,10 +61,7 @@ GEM
     rack (2.2.3)
     rake (13.0.3)
     rchardet (1.8.0)
-    rdoc (3.12.2)
-      json (~> 1.4)
-    rest-client (1.6.7)
-      mime-types (>= 1.16)
+    rdoc (6.3.0)
     rspec (3.5.0)
       rspec-core (~> 3.5.0)
       rspec-expectations (~> 3.5.0)
@@ -88,12 +82,14 @@ GEM
       json (>= 1.8, < 3)
       simplecov-html (~> 0.10.0)
     simplecov-html (0.10.2)
-    term-ansicolor (1.2.2)
-      tins (~> 0.8)
-    thor (0.18.1)
+    sync (0.5.0)
+    term-ansicolor (1.7.1)
+      tins (~> 1.0)
+    thor (1.0.1)
     thread_safe (0.3.6)
     thread_safe (0.3.6-java)
-    tins (0.13.2)
+    tins (1.26.0)
+      sync
 
 PLATFORMS
   ruby
@@ -105,7 +101,6 @@ DEPENDENCIES
   equalizer
   juwelier (~> 2.1.0)
   puts_debuggerer
-  rdoc (~> 3.12)
   rspec (~> 3.5.0)
   simplecov (~> 0.16.0)
 

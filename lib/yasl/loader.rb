@@ -36,13 +36,15 @@ module YASL
     end
     
     def load_classes_structure
-      structure['_classes'].each do |class_structure|
+      structure['_classes'].to_a.each do |class_structure|
         load_non_basic_data_type_object(class_structure, for_classes: true)
       end
     end
     
     def load_structure(structure, for_classes: false)
-      if YASL.json_basic_data_type?(structure) && !(structure.is_a?(String) && structure.start_with?('_'))
+      if top_level_class?(structure)
+        class_for(structure['_class'])
+      elsif YASL.json_basic_data_type?(structure) && !(structure.is_a?(String) && structure.start_with?('_'))
         structure
       elsif (structure['_class'] && (structure['_data'] || !structure.keys.detect {|key| key.start_with?('_') && key != '_class'} ))
         load_ruby_basic_data_type_object(structure['_class'], structure['_data'])
@@ -106,8 +108,6 @@ module YASL
         data.reduce({}) do |new_hash, pair|
           new_hash.merge(load_structure(pair.first) => load_structure(pair.last))
         end
-      else
-        class_for(class_name)
       end
     end
     
@@ -124,27 +124,20 @@ module YASL
       puts "Class #{class_name} does not exist! YASL expects the same classes used for serialization to exist during deserialization."
     end
     
-#     def top_level_class?(object, for_classes)
-#       (object.is_a?(Class) || object.is_a?(Module)) && !for_classes
-#     end
+    def top_level_class?(structure)
+      structure && structure.is_a?(Hash) && structure['_class'] && structure['_id'].nil? && structure['_instance_variables'].nil? && structure['_class_variables'].nil? && structure['_struct_member_values'].nil? && structure['_data'].nil?
+    end
     
     def add_to_classes(object)
       classes << object unless classes.include?(object)
     end
     
-#     def class_object_id(object)
-#       object_class_array = class_objects[class_for(object)]
-#       object_class_array_index = object_class_array&.index(object)
-#       (object_class_array_index + 1) unless object_class_array_index.nil?
-#     end
-    
     def object_for_id(klass, klass_object_id)
       object_class_array = class_objects[klass]
-      object_class_array&.[](klass_object_id - 1)
+      object_class_array&.[](klass_object_id - 1) # TODO fix implementation to rely on true ID not index (even if it matches ID)
     end
     
     def add_to_class_array(object)
-#       return if object.is_a?(Class) # TODO enable if needed or remove
       object_class = object.class
       class_objects[object_class] ||= []
       class_objects[object_class] << object unless class_objects[object_class].include?(object)

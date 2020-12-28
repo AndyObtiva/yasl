@@ -7,5 +7,9 @@ module Driving
     def reset_var!
       remove_instance_variable(:@var) if defined?(@var)
     end
+    
+    def var
+      @var
+    end
   end
 end
