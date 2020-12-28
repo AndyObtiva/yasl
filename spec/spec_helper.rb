@@ -106,7 +106,14 @@ RSpec.configure do |config|
 end
 
 $LOAD_PATH.unshift File.expand_path(File.join(__FILE__, '..', '..', 'lib'))
+$LOAD_PATH.unshift File.expand_path(File.join(__FILE__, '..'))
 
 require 'puts_debuggerer'
 require 'equalizer'
+
 require 'yasl'
+
+require 'fixtures/car'
+require 'fixtures/car_struct'
+require 'fixtures/driving'
+require 'fixtures/driving/person'
