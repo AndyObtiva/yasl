@@ -46,7 +46,7 @@ module YASL
         structure
       elsif (structure['_class'] && (structure['_data'] || !structure.keys.detect {|key| key.start_with?('_') && key != '_class'} ))
         load_ruby_basic_data_type_object(structure['_class'], structure['_data'])
-      elsif structure['_class'] && structure['_instance_variables']
+      elsif structure['_class'] && (structure['_instance_variables'] || structure['_class_variables'] || structure['_struct_member_values'])
         load_non_basic_data_type_object(structure)
       end
     end
@@ -63,6 +63,10 @@ module YASL
       structure['_instance_variables'].to_a.each do |instance_var, value|
         value = load_structure(value)
         object.instance_variable_set("@#{instance_var}".to_sym, value)
+      end
+      structure['_struct_member_values'].to_a.each do |member, value|
+        value = load_structure(value)
+        object[member.to_sym] = value
       end
       if for_classes
         structure['_class_variables'].to_a.each do |class_var, value|
@@ -127,11 +131,11 @@ module YASL
       classes << object unless classes.include?(object)
     end
     
-    def class_object_id(object)
-      object_class_array = class_objects[class_for(object)]
-      object_class_array_index = object_class_array&.index(object)
-      (object_class_array_index + 1) unless object_class_array_index.nil?
-    end
+#     def class_object_id(object)
+#       object_class_array = class_objects[class_for(object)]
+#       object_class_array_index = object_class_array&.index(object)
+#       (object_class_array_index + 1) unless object_class_array_index.nil?
+#     end
     
 #     def object_for_id(klass, klass_object_id)
 #       object_class_array = class_objects[klass]

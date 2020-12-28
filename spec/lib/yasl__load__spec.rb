@@ -58,7 +58,7 @@ RSpec.describe do
       car.complex_number = Complex(2,37)
       car.complex_polar_number = Complex.polar(-23,28)
       car.rational_number = Rational(22/7)
-      car.regex = /^[a-z][1-9]$/
+      car.regex = Regexp.new(/^[a-z][1-9]$/.to_s)
       car.symbol = :good
       car.set = Set.new([1, :b, 3.7])
       car.range = (1..7)
@@ -295,6 +295,8 @@ RSpec.describe do
         car1
         car2
         car3
+        person1
+        person2
         
         data = JSON.dump(
           _class: car2.class.name,
@@ -352,9 +354,124 @@ RSpec.describe do
         expect(Driving::Person.class_count).to eq(1)
       end
     end
+    
+    context 'Struct' do
+      it 'deserializes struct members of all Ruby basic data types' do
+        data = JSON.dump(
+          _class: car_struct1.class.name,
+          _id: 1,
+          _struct_member_values: {
+            make: car_struct1.make,
+            model: car_struct1.model,
+            year: car_struct1.year,
+            registration_time: {
+              _class: 'Time',
+              _data: car_struct1.registration_time.to_datetime.marshal_dump
+            },
+            registration_date: {
+              _class: 'Date',
+              _data: car_struct1.registration_date.marshal_dump
+            },
+            registration_date_time: {
+              _class: 'DateTime',
+              _data: car_struct1.registration_date_time.marshal_dump
+            },
+            complex_number: {
+              _class: 'Complex',
+              _data: car_struct1.complex_number.to_s
+            },
+            complex_polar_number: {
+              _class: 'Complex',
+              _data: car_struct1.complex_polar_number.to_s
+            },
+            rational_number: {
+              _class: 'Rational',
+              _data: car_struct1.rational_number.to_s
+            },
+            regex: {
+              _class: 'Regexp',
+              _data: car_struct1.regex.to_s
+            },
+            symbol: {
+              _class: 'Symbol',
+              _data: car_struct1.symbol.to_s
+            },
+            set: {
+              _class: 'Set',
+              _data: [
+                1,
+                {
+                  :_class => "Symbol",
+                  :_data => "b"
+                },
+                3.7
+              ]
+            },
+            range: {
+              _class: 'Range',
+              _data: [car_struct1.range.begin, car_struct1.range.end, car_struct1.range.exclude_end?]
+            },
+            range_exclusive: {
+              _class: 'Range',
+              _data: [car_struct1.range_exclusive.begin, car_struct1.range_exclusive.end, car_struct1.range_exclusive.exclude_end?]
+            },
+          }
+        )
+        
+        object = YASL.load(data)
+        
+        expect(object).to eq(car_struct1)
+      end
+         
+      it 'recursively deserializes member values and instance variables that are not basic data types' do
+        person1
+        person2
+        
+        data = JSON.dump(
+          _class: car_struct2.class.name,
+          _id: 1,
+          _instance_variables: {
+            owner: {
+              _class: 'Driving::Person',
+              _id: 1,
+              _instance_variables: {
+                dob: {
+                  _class: 'Time',
+                  _data: person1.dob.to_datetime.marshal_dump
+                },
+                name: person1.name,
+              }
+            }
+          },
+          _struct_member_values: {
+            make: car_struct2.make,
+            model: car_struct2.model,
+            year: car_struct2.year,
+          },
+          _classes: [
+            {
+              _class: person1.class.name,
+              _class_variables: {
+                class_count: 1,
+              },
+              _instance_variables: {
+                count: 1,
+              },
+            }
+          ],
+        )
+        object = YASL.load(data)
+        expect(object).to eq(car_struct2)
+        expect(Driving::Person.count).to_not eq(1)
+        expect(Driving::Person.class_count).to_not eq(1)
+        
+        object = YASL.load(data, include_classes: true)
+        expect(object).to eq(car_struct2)
+        expect(Driving::Person.count).to eq(1)
+        expect(Driving::Person.class_count).to eq(1)
+      end
+    end
   
-    xit 'deserializes basic object (no nesting)'
-    xit 'deserializes object recursively'
     xit 'deserializes object recursively with cycles'
     xit 'exception case for deserialize not finding a class'
     xit 'materialize a class matching a non-existing class'

@@ -3,16 +3,16 @@
 ## Next
 
 - Deserialize cycle references
-- Deserialize Struct members as JSON
 - Deserialize top-level classes and modules
 - Deserialize top-level Class occurence in variables as JSON
 - Deserialize top-level Module occurence in variables as JSON
-- Serialize whether a class reference is a class or module
 - Materialize a class matching the non-existing class
-- Support passing `whitelist_classes` to filter by upon load
 
 ## Soon
 
+- Serialize whether a class reference is a class or module
+- Serialize whether a class reference is a struct or not
+- Support passing `whitelist_classes` to filter by upon load
 
 ## Far Off
     
