@@ -46,7 +46,7 @@ module YASL
         structure
       elsif (structure['_class'] && (structure['_data'] || !structure.keys.detect {|key| key.start_with?('_') && key != '_class'} ))
         load_ruby_basic_data_type_object(structure['_class'], structure['_data'])
-      elsif structure['_class'] && (structure['_instance_variables'] || structure['_class_variables'] || structure['_struct_member_values'])
+      elsif structure['_class'] && (structure['_id'] || structure['_instance_variables'] || structure['_class_variables'] || structure['_struct_member_values'])
         load_non_basic_data_type_object(structure)
       end
     end
@@ -58,8 +58,11 @@ module YASL
       klass = class_for(class_name)
       add_to_classes(klass)
       klass.alias_method(:initialize_without_yasl, :initialize)
-      object = for_classes ? klass : klass.new
-      add_to_class_array(object) if !object.is_a?(Class) && !object.is_a?(Module)
+      object = structure['_id'] && object_for_id(klass, structure['_id'])
+      if object.nil?
+        object = for_classes ? klass : klass.new
+        add_to_class_array(object) if !object.is_a?(Class) && !object.is_a?(Module)
+      end
       structure['_instance_variables'].to_a.each do |instance_var, value|
         value = load_structure(value)
         object.instance_variable_set("@#{instance_var}".to_sym, value)
@@ -68,11 +71,9 @@ module YASL
         value = load_structure(value)
         object[member.to_sym] = value
       end
-      if for_classes
-        structure['_class_variables'].to_a.each do |class_var, value|
-          value = load_structure(value)
-          object.class_variable_set("@@#{class_var}".to_sym, value)
-        end
+      structure['_class_variables'].to_a.each do |class_var, value|
+        value = load_structure(value)
+        object.class_variable_set("@@#{class_var}".to_sym, value)
       end
       object
     ensure
@@ -137,10 +138,10 @@ module YASL
 #       (object_class_array_index + 1) unless object_class_array_index.nil?
 #     end
     
-#     def object_for_id(klass, klass_object_id)
-#       object_class_array = class_objects[klass]
-#       object_class_array&.[](klass_object_id - 1)
-#     end
+    def object_for_id(klass, klass_object_id)
+      object_class_array = class_objects[klass]
+      object_class_array&.[](klass_object_id - 1)
+    end
     
     def add_to_class_array(object)
 #       return if object.is_a?(Class) # TODO enable if needed or remove

@@ -15,4 +15,5 @@
 - Deserialize Module occurence in variables as JSON
 - Deserialize class variables as JSON
 - Deserialize Struct members as JSON
+- Deserialize cycles with object ID references
 - Support `include_classes` option on load

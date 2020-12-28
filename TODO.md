@@ -2,7 +2,6 @@
 
 ## Next
 
-- Deserialize cycle references
 - Deserialize top-level classes and modules
 - Deserialize top-level Class occurence in variables as JSON
 - Deserialize top-level Module occurence in variables as JSON
