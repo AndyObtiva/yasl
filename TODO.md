@@ -3,9 +3,7 @@
 ## Next
 
 - Deserialize Struct members as JSON
-- Deserialize class variables as JSON
-- Deserialize classes and modules
-- Support `include_classes` option on load
+- Deserialize top-level classes and modules
 - Deserialize top-level Class occurence in variables as JSON
 - Deserialize top-level Module occurence in variables as JSON
 - Deal with bypassing constructor args (perhaps providing an alternative to new)

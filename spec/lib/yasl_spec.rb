@@ -25,7 +25,7 @@ class Car
     end
     
     def class_count
-      @class_count
+      @@class_count
     end
   end
   
@@ -1129,8 +1129,10 @@ RSpec.describe do
     context 'Ruby objects and basic data types' do
       it 'serializes instance variables of all Ruby basic data types' do
         car1
+        car2
+        car3
         
-        object = YASL.load(JSON.dump(
+        data = JSON.dump(
           _class: car1.class.name,
           _id: 1,
           _instance_variables: {
@@ -1206,11 +1208,18 @@ RSpec.describe do
               },
             },
           ],
-        ))
+        )
+        object = YASL.load(data)
         
         expect(object).to eq(car1)
-#         expect(Car.count).to eq(1)
-#         expect(Car.class_count).to eq(1)
+        expect(Car.count).to_not eq(1)
+        expect(Car.class_count).to_not eq(1)
+        
+        object = YASL.load(data, include_classes: true)
+        
+        expect(object).to eq(car1)
+        expect(Car.count).to eq(1)
+        expect(Car.class_count).to eq(1)
       end
     end
   

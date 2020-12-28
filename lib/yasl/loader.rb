@@ -29,8 +29,16 @@ module YASL
       @class_objects = {}
     end
   
-    def load
-      load_structure(structure)
+    def load(include_classes: false)
+      load_structure(structure).tap do
+        load_classes_structure if include_classes
+      end
+    end
+    
+    def load_classes_structure
+      structure['_classes'].each do |class_structure|
+        load_non_basic_data_type_object(class_structure, for_classes: true)
+      end
     end
     
     def load_structure(structure, for_classes: false)
@@ -45,16 +53,22 @@ module YASL
     
     private
     
-    def load_non_basic_data_type_object(structure)
+    def load_non_basic_data_type_object(structure, for_classes: false)
       class_name = structure['_class']
       klass = class_for(class_name)
       add_to_classes(klass)
       klass.alias_method(:initialize_without_yasl, :initialize)
-      object = klass.new
-      add_to_class_array(object)
-      structure['_instance_variables'].each do |instance_var, value|
+      object = for_classes ? klass : klass.new
+      add_to_class_array(object) unless for_classes
+      structure['_instance_variables'].to_a.each do |instance_var, value|
         value = load_structure(value)
         object.instance_variable_set("@#{instance_var}".to_sym, value)
+      end
+      if for_classes
+        structure['_class_variables'].to_a.each do |class_var, value|
+          value = load_structure(value)
+          object.class_variable_set("@@#{class_var}".to_sym, value)
+        end
       end
       object
     ensure

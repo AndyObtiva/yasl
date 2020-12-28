@@ -31,7 +31,7 @@ module YASL
     
     def dump(include_classes: false)
       structure = dump_structure(object)
-      structure.merge!(dump_classes_structure(object)) if include_classes && structure.is_a?(Hash)
+      structure.merge!(dump_classes_structure) if include_classes && structure.is_a?(Hash)
       structure
     end
     
@@ -51,7 +51,7 @@ module YASL
       structure
     end
     
-    def dump_classes_structure(object)
+    def dump_classes_structure
       structure = {}
       structure[:_classes] ||= []
       @original_classes = []
@@ -93,11 +93,11 @@ module YASL
       klass = class_for(object)
       add_to_classes(klass)
       structure[:_class] = klass.name
-      the_object_id = object_id(object)
-      if the_object_id.nil?
+      the_class_object_id = class_object_id(object)
+      if the_class_object_id.nil?
         structure.merge!(dump_new_non_basic_data_type_structure(object))
       else
-        structure[:_id] = the_object_id
+        structure[:_id] = the_class_object_id
       end
       structure
     end
@@ -159,7 +159,7 @@ module YASL
       classes << object unless classes.include?(object)
     end
     
-    def object_id(object)
+    def class_object_id(object)
       object_class_array = class_objects[class_for(object)]
       object_class_array_index = object_class_array&.index(object)
       (object_class_array_index + 1) unless object_class_array_index.nil?
