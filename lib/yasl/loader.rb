@@ -59,7 +59,7 @@ module YASL
       add_to_classes(klass)
       klass.alias_method(:initialize_without_yasl, :initialize)
       object = for_classes ? klass : klass.new
-      add_to_class_array(object) unless for_classes
+      add_to_class_array(object) if !object.is_a?(Class) && !object.is_a?(Module)
       structure['_instance_variables'].to_a.each do |instance_var, value|
         value = load_structure(value)
         object.instance_variable_set("@#{instance_var}".to_sym, value)
@@ -143,7 +143,8 @@ module YASL
 #     end
     
     def add_to_class_array(object)
-      object_class = class_for(object)
+#       return if object.is_a?(Class) # TODO enable if needed or remove
+      object_class = object.class
       class_objects[object_class] ||= []
       class_objects[object_class] << object unless class_objects[object_class].include?(object)
       class_objects[object_class].index(object) + 1

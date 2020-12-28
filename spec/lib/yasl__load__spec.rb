@@ -471,6 +471,171 @@ RSpec.describe do
         expect(Driving::Person.class_count).to eq(1)
       end
     end
+    
+    it 'deserializes array containing non-JSON basic data type objects' do
+      car1
+      car2
+      car3
+      
+      person1
+      person2
+      person3
+      
+      data = JSON.dump(
+        _class: person2.class.name,
+        _id: 1,
+        _instance_variables: {
+          cars: {
+            _class: 'Array',
+            _data: [
+              {
+                _class: car3.class.name,
+                _id: 1,
+                _instance_variables: {
+                  make: car3.make,
+                  model: car3.model,
+                  year: car3.year,
+                },
+              },
+              {
+                _class: car4.class.name,
+                _id: 2,
+                _instance_variables: {
+                  make: car4.make,
+                  model: car4.model,
+                  year: car4.year,
+                },
+              },
+            ]
+          },
+          dob: {
+            _class: 'Time',
+            _data: person2.dob.to_datetime.marshal_dump
+          },
+          name: person2.name,
+        },
+        _classes: [
+          {
+            _class: person2.class.name,
+            _class_variables: {
+              class_count: 1,
+            },
+            _instance_variables: {
+              count: 1,
+            },
+          },
+          {
+            _class: car2.class.name,
+            _class_variables: {
+              class_count: 2,
+            },
+            _instance_variables: {
+              count: 2,
+            },
+          },
+        ],
+      )
+      
+      object = YASL.load(data, include_classes: false)
+      expect(object).to eq(person2)
+      expect(Car.count).to_not eq(1)
+      expect(Car.class_count).to_not eq(1)
+      expect(Driving::Person.count).to_not eq(1)
+      expect(Driving::Person.class_count).to_not eq(1)
+      
+      object = YASL.load(data, include_classes: true)
+      expect(object).to eq(person2)
+      expect(Car.count).to eq(2)
+      expect(Car.class_count).to eq(2)
+      expect(Driving::Person.count).to eq(1)
+      expect(Driving::Person.class_count).to eq(1)
+    end
+    
+    it 'deserializes hash containing non-JSON basic data type objects' do
+      car1
+      car2
+      car3
+      
+      person1
+      person2
+      person3
+            
+      data = JSON.dump(
+        _class: person3.class.name,
+        _id: 1,
+        _instance_variables: {
+          cars: {
+            _class: 'Hash',
+            _data: [
+              [
+                'car1',
+                {
+                  _class: car3.class.name,
+                  _id: 1,
+                  _instance_variables: {
+                    make: car3.make,
+                    model: car3.model,
+                    year: car3.year,
+                  },
+                },
+              ],
+              [
+                'car2',
+                {
+                  _class: car4.class.name,
+                  _id: 2,
+                  _instance_variables: {
+                    make: car4.make,
+                    model: car4.model,
+                    year: car4.year,
+                  },
+                },
+              ]
+            ]
+          },
+          dob: {
+            _class: 'Time',
+            _data: person3.dob.to_datetime.marshal_dump
+          },
+          name: person3.name,
+        },
+        _classes: [
+          {
+            _class: person3.class.name,
+            _class_variables: {
+              class_count: 1,
+            },
+            _instance_variables: {
+              count: 1,
+            },
+          },
+          {
+            _class: car2.class.name,
+            _class_variables: {
+              class_count: 2,
+            },
+            _instance_variables: {
+              count: 2,
+            },
+          },
+        ],
+      )
+      
+      object = YASL.load(data, include_classes: false)
+      expect(object).to eq(person3)
+      expect(Car.count).to_not eq(1)
+      expect(Car.class_count).to_not eq(1)
+      expect(Driving::Person.count).to_not eq(1)
+      expect(Driving::Person.class_count).to_not eq(1)
+      
+      object = YASL.load(data, include_classes: true)
+      expect(object).to eq(person3)
+      expect(Car.count).to eq(2)
+      expect(Car.class_count).to eq(2)
+      expect(Driving::Person.count).to eq(1)
+      expect(Driving::Person.class_count).to eq(1)
+    end
+        
   
     xit 'deserializes object recursively with cycles'
     xit 'exception case for deserialize not finding a class'
