@@ -119,9 +119,9 @@ module YASL
       puts "Class #{class_name} does not exist! YASL expects the same classes used for serialization to exist during deserialization."
     end
     
-    def top_level_class?(object, for_classes)
-      (object.is_a?(Class) || object.is_a?(Module)) && !for_classes
-    end
+#     def top_level_class?(object, for_classes)
+#       (object.is_a?(Class) || object.is_a?(Module)) && !for_classes
+#     end
     
     def add_to_classes(object)
       classes << object unless classes.include?(object)
