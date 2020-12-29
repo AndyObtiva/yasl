@@ -26,7 +26,31 @@ car.complex_polar_number = Complex.polar(-23,28)
 car.rational_number = Rational(22/7)
 
 dump = YASL.dump(car)
+car2 = YASL.load(dump, whitelist_classes: [Car])
 
-puts dump.inspect
+puts car2.make
+# => Mitsubishi
 
-# => "{\"_class\":\"Car\",\"_id\":1,\"_instance_variables\":{\"make\":\"Mitsubishi\",\"model\":\"Eclipse\",\"year\":\"2002\",\"registration_time\":{\"_class\":\"Time\",\"_data\":[0,2452932,49177,\"12644383719423828125/137438953472\",-10800,2299161.0]},\"registration_date\":{\"_class\":\"Date\",\"_data\":[0,2452932,0,0,0,2299161.0]},\"registration_date_time\":{\"_class\":\"DateTime\",\"_data\":[0,2452932,49177,92000000,-10800,2299161.0]},\"complex_number\":{\"_class\":\"Complex\",\"_data\":\"2+37i\"},\"complex_polar_number\":{\"_class\":\"Complex\",\"_data\":\"22.13993492521203-6.230833131080988i\"},\"rational_number\":{\"_class\":\"Rational\",\"_data\":\"3/1\"}}}"
+puts car2.model
+# => Eclipse
+
+puts car2.year
+# => 2002
+
+puts car2.registration_time
+# => 2003-10-19 10:39:37 -0300
+
+puts car2.registration_date
+# => 2003-10-19
+
+puts car2.registration_date_time
+# => 2003-10-19T10:39:37-03:00
+
+puts car2.complex_number
+# => 2+37i
+
+puts car2.complex_polar_number
+# => 22.13993492521203-6.230833131080988i
+
+puts car2.rational_number
+# => 3/1

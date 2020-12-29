@@ -2,8 +2,6 @@
 
 ## Next
 
-- Add more samples/documentation
-
 ## Future
 
 - Serialize whether a class reference is a class or module

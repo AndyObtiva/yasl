@@ -1,4 +1,5 @@
 # YASL - Yet Another Serialization Library
+[![Gem Version](https://badge.fury.io/rb/yasl.svg)](http://badge.fury.io/rb/yasl)
 [![Ruby](https://github.com/AndyObtiva/yasl/workflows/Ruby/badge.svg)](https://github.com/AndyObtiva/yasl/actions?query=workflow%3ARuby)
 [![Coverage Status](https://coveralls.io/repos/github/AndyObtiva/yasl/badge.svg?branch=master)](https://coveralls.io/github/AndyObtiva/yasl?branch=master)
 [![Maintainability](https://api.codeclimate.com/v1/badges/e8d043b8c78c801f0aa3/maintainability)](https://codeclimate.com/github/AndyObtiva/yasl/maintainability)
@@ -14,8 +15,6 @@ A pure Ruby serialization library that works across different Ruby implementatio
 - JSON encoding is good enough. No need for premature optimization.
 
 ## Usage Instructions
-
-[GEM NOT YET PUBLISHED]
 
 Run:
 
@@ -39,9 +38,9 @@ require 'yasl'
 
 ### Serialize
 
-To serialize, use the `YASL#dump` method.
+To serialize, use the `YASL#dump(object)` method.
 
-Example (from [samples/basic.rb](samples/basic.rb)):
+Example (from [samples/dump_basic.rb](samples/dump_basic.rb)):
 
 ```ruby
 require 'yasl'
@@ -80,7 +79,7 @@ puts dump.inspect
 
 YASL automatically detects cycles when serializing bidirectional object references.
 
-Example (from [samples/cycle.rb](samples/cycle.rb)):
+Example (from [samples/dump_cycle.rb](samples/dump_cycle.rb)):
 
 ```ruby
 $LOAD_PATH.unshift File.expand_path(File.join(__dir__, '..', 'lib'))
@@ -142,13 +141,77 @@ puts dump.inspect
 # => "{\"_class\":\"Car\",\"_id\":1,\"_instance_variables\":{\"make\":\"Mitsubishi\",\"model\":\"Eclipse\",\"owner\":{\"_class\":\"Person\",\"_id\":1,\"_instance_variables\":{\"cars\":{\"_class\":\"Array\",\"_data\":[{\"_class\":\"Car\",\"_id\":1}]},\"dob\":{\"_class\":\"Time\",\"_data\":[0,2458044,50584,0,-14400,2299161.0]},\"name\":\"Sean Hux\"}},\"year\":\"2002\"}}"
 ```
 
-#### `include_classes` option
+### Deserialize
 
-(default: `false`)
+To deserialize, use the `YASL#load(data, whitelist_classes: [])` method. The value of `whitelist_classes` must mention all classes expected to appear in the serialized data to load. This is required to ensure software security by not allowing arbitrary unexpected classes to be deserialized.
 
-Passing `include_classes: true` to the `YASL#dump` method causes YASL to serialize classes and modules too (class variables and singleton class instance variables). They go under the `_classes` JSON array.
+Example (from [samples/load_basic.rb](samples/load_basic.rb)):
 
-Example (from [samples/include_classes.rb](samples/include_classes.rb)):
+```ruby
+$LOAD_PATH.unshift File.expand_path(File.join(__dir__, '..', 'lib'))
+
+require 'yasl'
+
+class Car
+  attr_accessor :make,
+                :model,
+                :year,
+                :registration_time,
+                :registration_date,
+                :registration_date_time,
+                :complex_number,
+                :complex_polar_number,
+                :rational_number
+end
+
+car = Car.new
+car.make = 'Mitsubishi'
+car.model = 'Eclipse'
+car.year = '2002'
+car.registration_time = Time.new(2003, 10, 19, 10, 39, 37.092, '-03:00')
+car.registration_date = Date.new(2003, 10, 19)
+car.registration_date_time = DateTime.new(2003, 10, 19, 10, 39, 37.092, '-03:00')
+car.complex_number = Complex(2,37)
+car.complex_polar_number = Complex.polar(-23,28)
+car.rational_number = Rational(22/7)
+
+dump = YASL.dump(car)
+car2 = YASL.load(dump, whitelist_classes: [Car])
+
+puts car2.make
+# => Mitsubishi
+
+puts car2.model
+# => Eclipse
+
+puts car2.year
+# => 2002
+
+puts car2.registration_time
+# => 2003-10-19 10:39:37 -0300
+
+puts car2.registration_date
+# => 2003-10-19
+
+puts car2.registration_date_time
+# => 2003-10-19T10:39:37-03:00
+
+puts car2.complex_number
+# => 2+37i
+
+puts car2.complex_polar_number
+# => 22.13993492521203-6.230833131080988i
+
+puts car2.rational_number
+# => 3/1
+
+```
+
+#### Cycles
+
+YASL automatically restores cycles when deserializing bidirectional object references.
+
+Example (from [samples/load_cycle.rb](samples/load_cycle.rb)):
 
 ```ruby
 $LOAD_PATH.unshift File.expand_path(File.join(__dir__, '..', 'lib'))
@@ -183,7 +246,7 @@ class Person
     end
   end
   
-  attr_accessor :name, :dob
+  attr_accessor :name, :dob, :cars
   
   def initialize
     self.class.increment_count!
@@ -199,27 +262,36 @@ car = Car.new
 car.make = 'Mitsubishi'
 car.model = 'Eclipse'
 car.year = '2002'
+
 car.owner = person
+person.cars = [car]
 
-dump = YASL.dump(car, include_classes: true)
+dump = YASL.dump(car)
+car2 = YASL.load(dump, whitelist_classes: [Car, Person])
 
-puts dump.inspect
+puts car2.make
+# => Mitsubishi
 
-# => "{\"_class\":\"Car\",\"_id\":1,\"_instance_variables\":{\"make\":\"Mitsubishi\",\"model\":\"Eclipse\",\"owner\":{\"_class\":\"Person\",\"_id\":1,\"_instance_variables\":{\"dob\":{\"_class\":\"Time\",\"_data\":[0,2458044,50584,0,-14400,2299161.0]},\"name\":\"Sean Hux\"}},\"year\":\"2002\"},\"_classes\":[{\"_class\":\"Person\",\"_class_variables\":{\"class_count\":1},\"_instance_variables\":{\"count\":1}}]}"
-```
+puts car2.model
+# => Eclipse
 
-### Deserialize
+puts car2.year
+# => 2002
 
-[DESERIALIZE NOT FULLY IMPLEMENTED]
+puts car2.owner
+# => #<Person:0x00007ffdf008dc20>
 
-To deserialize, use the `YASL#load` method.
+puts car2.owner.name
+# => Sean Hux
 
-```ruby
-require 'yasl'
+puts car2.owner.dob
+# => 2017-10-17 10:03:04 -0400
 
-dump = "{\"_class\":\"Car\",\"_id\":1,\"_instance_variables\":{\"make\":\"Mitsubishi\",\"model\":\"Eclipse\",\"year\":\"2002\",\"registration_time\":{\"_class\":\"Time\",\"_data\":[0,2452932,49177,\"12644383719423828125/137438953472\",-10800,2299161.0]},\"registration_date\":{\"_class\":\"Date\",\"_data\":[0,2452932,0,0,0,2299161.0]},\"registration_date_time\":{\"_class\":\"DateTime\",\"_data\":[0,2452932,49177,92000000,-10800,2299161.0]},\"complex_number\":{\"_class\":\"Complex\",\"_data\":\"2+37i\"},\"complex_polar_number\":{\"_class\":\"Complex\",\"_data\":\"22.13993492521203-6.230833131080988i\"},\"rational_number\":{\"_class\":\"Rational\",\"_data\":\"3/1\"}}}"
+puts car2.owner.cars.inspect
+# => [#<Car:0x00007ffdf008e120 @make="Mitsubishi", @model="Eclipse", @year="2002", @owner=#<Person:0x00007ffdf008dc20 @name="Sean Hux", @dob=2017-10-17 10:03:04 -0400, @cars=[...]>>]
 
-car = YASL.load(dump)
+puts car2.inspect
+# => #<Car:0x00007ffdf008e120 @make="Mitsubishi", @model="Eclipse", @year="2002", @owner=#<Person:0x00007ffdf008dc20 @name="Sean Hux", @dob=2017-10-17 10:03:04 -0400, @cars=[#<Car:0x00007ffdf008e120 ...>]>>
 ```
 
 ## Contributing

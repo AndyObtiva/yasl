@@ -51,7 +51,28 @@ car.owner = person
 person.cars = [car]
 
 dump = YASL.dump(car)
+car2 = YASL.load(dump, whitelist_classes: [Car, Person])
 
-puts dump.inspect
+puts car2.make
+# => Mitsubishi
 
-# => "{\"_class\":\"Car\",\"_id\":1,\"_instance_variables\":{\"make\":\"Mitsubishi\",\"model\":\"Eclipse\",\"owner\":{\"_class\":\"Person\",\"_id\":1,\"_instance_variables\":{\"cars\":{\"_class\":\"Array\",\"_data\":[{\"_class\":\"Car\",\"_id\":1}]},\"dob\":{\"_class\":\"Time\",\"_data\":[0,2458044,50584,0,-14400,2299161.0]},\"name\":\"Sean Hux\"}},\"year\":\"2002\"}}"
+puts car2.model
+# => Eclipse
+
+puts car2.year
+# => 2002
+
+puts car2.owner
+# => #<Person:0x00007ffdf008dc20>
+
+puts car2.owner.name
+# => Sean Hux
+
+puts car2.owner.dob
+# => 2017-10-17 10:03:04 -0400
+
+puts car2.owner.cars.inspect
+# => [#<Car:0x00007ffdf008e120 @make="Mitsubishi", @model="Eclipse", @year="2002", @owner=#<Person:0x00007ffdf008dc20 @name="Sean Hux", @dob=2017-10-17 10:03:04 -0400, @cars=[...]>>]
+
+puts car2.inspect
+# => #<Car:0x00007ffdf008e120 @make="Mitsubishi", @model="Eclipse", @year="2002", @owner=#<Person:0x00007ffdf008dc20 @name="Sean Hux", @dob=2017-10-17 10:03:04 -0400, @cars=[#<Car:0x00007ffdf008e120 ...>]>>
