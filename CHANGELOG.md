@@ -19,3 +19,4 @@
 - Deserialize top-level class/module from JSON
 - Support `include_classes` option on load
 - Raise error for deserialization not finding a class mentioned in the data
+- Require passing `whitelist_classes` to `YASL#load` or else raise error for illegal classes

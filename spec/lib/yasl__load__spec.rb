@@ -115,6 +115,10 @@ RSpec.describe do
     end
   }
   
+  let(:whitelist_classes) {
+    [Car, CarStruct, Driving, Driving::Person]
+  }
+  
   before do
     Car.reset_class_count!
     Car.reset_count!
@@ -278,13 +282,13 @@ RSpec.describe do
             },
           ],
         )
-        object = YASL.load(data)
+        object = YASL.load(data, whitelist_classes: whitelist_classes)
         
         expect(object).to eq(car1)
         expect(Car.count).to_not eq(1)
         expect(Car.class_count).to_not eq(1)
         
-        object = YASL.load(data, include_classes: true)
+        object = YASL.load(data, whitelist_classes: whitelist_classes, include_classes: true)
         
         expect(object).to eq(car1)
         expect(Car.count).to eq(1)
@@ -339,14 +343,14 @@ RSpec.describe do
           ],
         )
         
-        object = YASL.load(data)
+        object = YASL.load(data, whitelist_classes: whitelist_classes)
         expect(object).to eq(car2)
         expect(Car.count).to_not eq(1)
         expect(Car.class_count).to_not eq(1)
         expect(Driving::Person.count).to_not eq(1)
         expect(Driving::Person.class_count).to_not eq(1)
         
-        object = YASL.load(data, include_classes: true)
+        object = YASL.load(data, whitelist_classes: whitelist_classes, include_classes: true)
         expect(object).to eq(car2)
         expect(Car.count).to eq(1)
         expect(Car.class_count).to eq(1)
@@ -418,7 +422,7 @@ RSpec.describe do
           }
         )
         
-        object = YASL.load(data)
+        object = YASL.load(data, whitelist_classes: whitelist_classes)
         
         expect(object).to eq(car_struct1)
       end
@@ -460,12 +464,12 @@ RSpec.describe do
             }
           ],
         )
-        object = YASL.load(data)
+        object = YASL.load(data, whitelist_classes: whitelist_classes)
         expect(object).to eq(car_struct2)
         expect(Driving::Person.count).to_not eq(1)
         expect(Driving::Person.class_count).to_not eq(1)
         
-        object = YASL.load(data, include_classes: true)
+        object = YASL.load(data, whitelist_classes: whitelist_classes, include_classes: true)
         expect(object).to eq(car_struct2)
         expect(Driving::Person.count).to eq(1)
         expect(Driving::Person.class_count).to eq(1)
@@ -536,14 +540,14 @@ RSpec.describe do
         ],
       )
       
-      object = YASL.load(data, include_classes: false)
+      object = YASL.load(data, whitelist_classes: whitelist_classes, include_classes: false)
       expect(object).to eq(person2)
       expect(Car.count).to_not eq(2)
       expect(Car.class_count).to_not eq(2)
       expect(Driving::Person.count).to_not eq(1)
       expect(Driving::Person.class_count).to_not eq(1)
       
-      object = YASL.load(data, include_classes: true)
+      object = YASL.load(data, whitelist_classes: whitelist_classes, include_classes: true)
       expect(object).to eq(person2)
       expect(Car.count).to eq(2)
       expect(Car.class_count).to eq(2)
@@ -621,14 +625,14 @@ RSpec.describe do
         ],
       )
       
-      object = YASL.load(data, include_classes: false)
+      object = YASL.load(data, whitelist_classes: whitelist_classes, include_classes: false)
       expect(object).to eq(person3)
       expect(Car.count).to_not eq(1)
       expect(Car.class_count).to_not eq(1)
       expect(Driving::Person.count).to_not eq(1)
       expect(Driving::Person.class_count).to_not eq(1)
       
-      object = YASL.load(data, include_classes: true)
+      object = YASL.load(data, whitelist_classes: whitelist_classes, include_classes: true)
       expect(object).to eq(person3)
       expect(Car.count).to eq(2)
       expect(Car.class_count).to eq(2)
@@ -709,14 +713,14 @@ RSpec.describe do
         ],
       )
       
-      object = YASL.load(data) # include_classes: false
+      object = YASL.load(data, whitelist_classes: whitelist_classes) # include_classes: false
       expect(object).to eq(person4)
       expect(Car.count).to_not eq(1)
       expect(Car.class_count).to_not eq(1)
       expect(Driving::Person.count).to_not eq(1)
       expect(Driving::Person.class_count).to_not eq(1)
 
-      object = YASL.load(data, include_classes: true)
+      object = YASL.load(data, whitelist_classes: whitelist_classes, include_classes: true)
       expect(object).to eq(person4)
       expect(Car.count).to eq(2)
       expect(Car.class_count).to eq(2)
@@ -740,12 +744,12 @@ RSpec.describe do
             }
           ]
         )
-        object = YASL.load(data, include_classes: false)
+        object = YASL.load(data, whitelist_classes: whitelist_classes, include_classes: false)
         expect(object).to eq(Car)
         expect(Car.count).to_not eq(4)
         expect(Car.class_count).to_not eq(4)
         
-        object = YASL.load(data, include_classes: true)
+        object = YASL.load(data, whitelist_classes: whitelist_classes, include_classes: true)
         expect(object).to eq(Car)
         expect(Car.count).to eq(4)
         expect(Car.class_count).to eq(4)
@@ -764,11 +768,11 @@ RSpec.describe do
           ]
         )
         
-        object = YASL.load(data, include_classes: false)
+        object = YASL.load(data, whitelist_classes: whitelist_classes, include_classes: false)
         expect(object).to eq(Driving)
         expect(Driving.var).to_not eq('var value')
         
-        object = YASL.load(data, include_classes: true)
+        object = YASL.load(data, whitelist_classes: whitelist_classes, include_classes: true)
         expect(object).to eq(Driving)
         expect(Driving.var).to eq('var value')
       end
@@ -796,7 +800,26 @@ RSpec.describe do
         }
       )
       
-      expect { YASL.load(data) }.to raise_error("Class `OtherClass` does not exist! YASL expects the same classes used for serialization to exist during deserialization.")
+      expect { YASL.load(data, whitelist_classes: whitelist_classes) }.to raise_error("Class `OtherClass` does not exist! YASL expects the same classes used for serialization to exist during deserialization.")
+    end
+    
+    it 'raises error when deserializing data with a class not mentioned in whitelist_classes' do
+      data = JSON.dump(
+        _class: 'Car',
+      )
+      
+      expect { YASL.load(data) }.to raise_error("Class `Car` is not mentioned in `whitelist_classes` (e.g. `YASL.load(data, whitelist_classes: [Car])`)!")
+      
+      data = JSON.dump(
+        _class: 'Car',
+        _instance_variables: {
+          class_attribute: {
+            _class: 'Driving::Person'
+          },
+        }
+      )
+      
+      expect { YASL.load(data, whitelist_classes: [Car]) }.to raise_error("Class `Driving::Person` is not mentioned in `whitelist_classes` (e.g. `YASL.load(data, whitelist_classes: [Driving::Person])`)!")
     end
     
   end

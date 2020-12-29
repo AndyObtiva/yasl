@@ -36,8 +36,8 @@ module YASL
       JSON.dump(Dumper.new(object).dump(include_classes: include_classes))
     end
     
-    def load(data, include_classes: false)
-      Loader.new(JSON.load(data)).load(include_classes: include_classes)
+    def load(data, include_classes: false, whitelist_classes: [])
+      Loader.new(JSON.load(data), whitelist_classes: whitelist_classes).load(include_classes: include_classes)
     end
     
     def json_basic_data_type?(object)

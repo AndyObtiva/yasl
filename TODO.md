@@ -2,7 +2,7 @@
 
 ## Next
 
-- Require passing `whitelist_classes` to `YASL#load` to raise error for illegal classes
+- Add more samples/documentation
 
 ## Future
 

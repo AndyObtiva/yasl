@@ -21,11 +21,11 @@
 
 module YASL
   class Loader
-    attr_reader :structure, :classes, :class_objects
+    attr_reader :structure, :whitelist_classes, :class_objects
     
-    def initialize(structure)
+    def initialize(structure, whitelist_classes: [])
       @structure = structure
-      @classes = []
+      @whitelist_classes = whitelist_classes
       @class_objects = {}
     end
   
@@ -58,7 +58,6 @@ module YASL
     def load_non_basic_data_type_object(structure, for_classes: false)
       class_name = structure['_class']
       object_class = class_for(class_name)
-#       add_to_classes(object_class) # TODO swap with test of whether object_class belongs to whitelist_classes
       object_class.alias_method(:initialize_without_yasl, :initialize)
       object = object_for_id(object_class, structure['_id'])
       if object.nil?
@@ -79,7 +78,7 @@ module YASL
       end
       object
     ensure
-      object_class.define_method(:initialize, object_class.instance_method(:initialize_without_yasl))
+      object_class&.define_method(:initialize, object_class.instance_method(:initialize_without_yasl))
     end
     
     def load_ruby_basic_data_type_object(class_name, data)
@@ -116,9 +115,13 @@ module YASL
     def class_for(class_name)
       class_name_components = class_name.to_s.split('::')
       current_class = Object
-      class_name_components.reduce(Object) do |result_class, class_name|
+      object_class = class_name_components.reduce(Object) do |result_class, class_name|
         result_class.const_get(class_name)
       end
+      if !@whitelist_classes.include?(object_class)
+        raise "Class `#{class_name}` is not mentioned in `whitelist_classes` (e.g. `YASL.load(data, whitelist_classes: [#{class_name}])`)!"
+      end
+      object_class
     rescue NameError
       # TODO materialize a class matching the non-existing class
       raise "Class `#{class_name}` does not exist! YASL expects the same classes used for serialization to exist during deserialization."

@@ -124,7 +124,6 @@ module YASL
     
     def dump_instance_variables(object)
       structure = {}
-      structure
       if !object.instance_variables.empty?
         structure[:_instance_variables] = object.instance_variables.sort.reduce({}) do |instance_vars, var|
           value = object.instance_variable_get(var)
