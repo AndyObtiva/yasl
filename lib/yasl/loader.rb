@@ -57,13 +57,13 @@ module YASL
     
     def load_non_basic_data_type_object(structure, for_classes: false)
       class_name = structure['_class']
-      klass = class_for(class_name)
-      add_to_classes(klass)
-      klass.alias_method(:initialize_without_yasl, :initialize)
-      object = structure['_id'] && object_for_id(klass, structure['_id'])
+      object_class = class_for(class_name)
+      add_to_classes(object_class)
+      object_class.alias_method(:initialize_without_yasl, :initialize)
+      object = object_for_id(object_class, structure['_id'])
       if object.nil?
-        object = for_classes ? klass : klass.new
-        add_to_class_array(object) if !object.is_a?(Class) && !object.is_a?(Module)
+        object = for_classes ? object_class : object_class.new
+        add_to_class_array(object, structure['_id']) if !object.is_a?(Class) && !object.is_a?(Module)
       end
       structure['_instance_variables'].to_a.each do |instance_var, value|
         value = load_structure(value)
@@ -79,7 +79,7 @@ module YASL
       end
       object
     ensure
-      klass.define_method(:initialize, klass.instance_method(:initialize_without_yasl))
+      object_class.define_method(:initialize, object_class.instance_method(:initialize_without_yasl))
     end
     
     def load_ruby_basic_data_type_object(class_name, data)
@@ -132,16 +132,21 @@ module YASL
       classes << object unless classes.include?(object)
     end
     
-    def object_for_id(klass, klass_object_id)
-      object_class_array = class_objects[klass]
-      object_class_array&.[](klass_object_id - 1) # TODO fix implementation to rely on true ID not index (even if it matches ID)
+    def class_objects_for(object_class)
+      class_objects[object_class] ||= {}
     end
     
-    def add_to_class_array(object)
+    def object_for_id(object_class, class_object_id)
+      return if class_object_id.nil?
+      return unless (object_class.is_a?(Class) || object_class.is_a?(Module))
+      class_objects_for(object_class)[class_object_id.to_i]
+    end
+    
+    def add_to_class_array(object, class_object_id)
+      return if class_object_id.nil?
       object_class = object.class
-      class_objects[object_class] ||= []
-      class_objects[object_class] << object unless class_objects[object_class].include?(object)
-      class_objects[object_class].index(object) + 1
+      found_object = object_for_id(object_class, class_object_id)
+      class_objects_for(object_class)[class_object_id.to_i] = object unless found_object
     end
             
   end
