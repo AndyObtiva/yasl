@@ -18,3 +18,4 @@
 - Deserialize cycles with object ID references
 - Deserialize top-level class/module from JSON
 - Support `include_classes` option on load
+- Raise error for deserialization not finding a class mentioned in the data

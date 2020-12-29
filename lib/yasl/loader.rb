@@ -114,14 +114,14 @@ module YASL
     private
     
     def class_for(class_name)
-      class_name_components = class_name.split('::')
+      class_name_components = class_name.to_s.split('::')
       current_class = Object
       class_name_components.reduce(Object) do |result_class, class_name|
         result_class.const_get(class_name)
       end
-    rescue => e
+    rescue NameError
       # TODO materialize a class matching the non-existing class
-      puts "Class #{class_name} does not exist! YASL expects the same classes used for serialization to exist during deserialization."
+      raise "Class `#{class_name}` does not exist! YASL expects the same classes used for serialization to exist during deserialization."
     end
     
     def top_level_class?(structure)

@@ -774,7 +774,29 @@ RSpec.describe do
       end
     end
     
-    xit 'raises error when deserializing data with a class that is not found' do
+    it 'raises error when deserializing data with a class that is not found' do
+      data = JSON.dump(
+        _class: 'SomeClass',
+      )
+      
+      expect { YASL.load(data) }.to raise_error("Class `SomeClass` does not exist! YASL expects the same classes used for serialization to exist during deserialization.")
+      
+      data = JSON.dump(
+        _class: 23892,
+      )
+
+      expect { YASL.load(data) }.to raise_error("Class `23892` does not exist! YASL expects the same classes used for serialization to exist during deserialization.")
+      
+      data = JSON.dump(
+        _class: 'Car',
+        _instance_variables: {
+          class_attribute: {
+            _class: 'OtherClass'
+          },
+        }
+      )
+      
+      expect { YASL.load(data) }.to raise_error("Class `OtherClass` does not exist! YASL expects the same classes used for serialization to exist during deserialization.")
     end
     
   end
