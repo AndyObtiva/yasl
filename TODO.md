@@ -2,6 +2,8 @@
 
 ## Next
 
+- Silently ignore non-serializable objects like Proc, Binding, and IO.
+
 ## Future
 
 - Serialize whether a class reference is a class or module
