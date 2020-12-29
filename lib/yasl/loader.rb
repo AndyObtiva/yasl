@@ -58,7 +58,7 @@ module YASL
     def load_non_basic_data_type_object(structure, for_classes: false)
       class_name = structure['_class']
       object_class = class_for(class_name)
-      add_to_classes(object_class)
+#       add_to_classes(object_class) # TODO swap with test of whether object_class belongs to whitelist_classes
       object_class.alias_method(:initialize_without_yasl, :initialize)
       object = object_for_id(object_class, structure['_id'])
       if object.nil?
