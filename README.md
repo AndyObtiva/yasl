@@ -1,18 +1,21 @@
 # YASL - Yet Another Serialization Library
 [![Gem Version](https://badge.fury.io/rb/yasl.svg)](http://badge.fury.io/rb/yasl)
-[![Ruby](https://github.com/AndyObtiva/yasl/workflows/Ruby/badge.svg)](https://github.com/AndyObtiva/yasl/actions?query=workflow%3ARuby)
+[![rspec](https://github.com/AndyObtiva/yasl/workflows/rspec/badge.svg)](https://github.com/AndyObtiva/yasl/actions?query=workflow%3Arspec)
 [![Coverage Status](https://coveralls.io/repos/github/AndyObtiva/yasl/badge.svg?branch=master)](https://coveralls.io/github/AndyObtiva/yasl?branch=master)
 [![Maintainability](https://api.codeclimate.com/v1/badges/e8d043b8c78c801f0aa3/maintainability)](https://codeclimate.com/github/AndyObtiva/yasl/maintainability)
 
-A pure Ruby serialization library that works across different Ruby implementations like Opal and JRuby as an alternative to YAML/Marshal.
+A pure Ruby serialization library that works across different Ruby implementations like [Opal](https://opalrb.com/) and [JRuby](https://www.jruby.org/) as an alternative to YAML/Marshal.
+
+(Note: this is an early alpha gem, so please use with caution, and report any encountered issues or feature suggestions to help improve)
 
 ## Requirements
 
-- Portablity across different Ruby implementations, especially Opal and JRuby.
-- Zero configuration. Developers are too busy solving business domain problems to worry about low-level serialization details.
-- Silently ignore non-serializable objects like `Proc`, `Binding`, and `IO`.
-- Support serializing classes and modules, not just object instances.
-- JSON encoding is good enough. No need for premature optimization.
+- Portablity across different Ruby implementations, especially [Opal](https://opalrb.com/) in the web browser and [JRuby](https://www.jruby.org/).
+- Zero required configuration. Developers are too busy solving business domain problems to worry about low-level serialization details.
+- Silently ignore non-serializable objects (unlike Marshal), such as `Proc`, `Binding`, and `IO`.
+- No special performance requirements. No high throughput usage. Average Internet speeds.
+- Ensure system safety through secure deserialization.
+- JSON encoding is good enough. No need for premature optimization. 
 
 ## Usage Instructions
 
@@ -40,9 +43,9 @@ require 'yasl'
 
 To serialize, use the `YASL#dump(object)` method.
 
-Keep in mind that `YASL::UNSERIALIZABLE_DATA_TYPES` classes are unserializable, and will serialize as `nil` (feel free to add more classes that you would like filtered out):
+Keep in mind that `YASL::UNSERIALIZABLE_DATA_TYPES` class names are unserializable, and will serialize as `nil` (feel free to add more class names that you would like filtered out):
 
-`Proc`, `Binding`, `IO`, `File::Stat`, `Dir`, `BasicSocket`, `MatchData`, `Method`, `UnboundMethod`, `Thread`, `ThreadGroup`, `Continuation`
+`'Proc'`, `'Binding'`, `'IO'`, `'File::Stat'`, `'Dir'`, `'BasicSocket'`, `'MatchData'`, `'Method'`, `'UnboundMethod'`, `'Thread'`, `'ThreadGroup'`, `'Continuation'`
 
 Example (from [samples/dump_basic.rb](samples/dump_basic.rb)):
 
@@ -148,7 +151,7 @@ puts dump.inspect
 
 ### Deserialize
 
-To deserialize, use the `YASL#load(data, whitelist_classes: [])` method. The value of `whitelist_classes` must mention all classes expected to appear in the serialized data to load. This is required to ensure software security by not allowing arbitrary unexpected classes to be deserialized.
+To deserialize, use the `YASL#load(data, whitelist_classes: [])` method. The `whitelist_classes` array must mention all classes expected to appear in the serialized data to load. This is required to ensure software security by not allowing arbitrary unexpected classes to be deserialized.
 
 By default, only `YASL::RUBY_BASIC_DATA_TYPES` classes are deserialized:
 

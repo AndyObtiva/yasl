@@ -2,21 +2,25 @@
 
 ## Next
 
-
+- Support BigDecimal serialization
+- Support deserialization fallbacks of instance variables for Struct member values and vice versa
+- Make `whitelist_classes` work with string class names
+- Make `YASL::UNSERIALIZABLE_DATA_TYPES` work with regular classes too
+- Refactor to improve maintainability score
+- Include optional pure Ruby reimplementaiton of Struct to avoid JS issues in Opal Struct when needed
 
 ## Future
 
-- Support `whitelist_classes` on load to also include basic types (people could use YASL constants to avoid typing all by hand), documenting default as YASL::RUBY_BASIC_DATA_TYPES
+- Improve support for `whitelist_classes` on load to also filter basic types if any of them are mentioned
 - Support `whitelist_classes` on dump, ignoring other classes silently without complaining
 - Support `blacklist_classes` on dump, ignoring classes silently without complaining
 
 ## Far Off
     
-- Serialize whether a class reference is a class or module
-- Serialize whether a class reference is a struct or not
-- Materialize a class matching a non-existing class
+- Support materializing a class matching a non-existing class during deserialization by ensuring serialization includes whether a class reference is a class, module, or struct along with all ancestors
 - Handle exception in instance variable matching class name (e.g. an attribute begins with '_data')
 
 ## Just Ideas
 
 - Filter by attributes (whitelist or blacklist) on dump
+- Limit number of lifetime deserialized symbols to prevent symbol DOS attacks in a programmer friendly way without requiring them to know all symbols in advance, which can be very impractical
