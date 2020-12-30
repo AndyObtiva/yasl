@@ -111,9 +111,14 @@ $LOAD_PATH.unshift File.expand_path(File.join(__FILE__, '..', '..', 'lib'))
 $LOAD_PATH.unshift File.expand_path(File.join(__FILE__, '..'))
 
 require 'puts_debuggerer'
-require 'equalizer'
 
 require 'yasl'
+
+require 'equalizer'
+require 'date'
+require 'set'
+require 'continuation'
+require 'socket'
 
 require 'fixtures/car'
 require 'fixtures/car_struct'

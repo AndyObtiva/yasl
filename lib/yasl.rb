@@ -20,19 +20,15 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 require 'json'
-require 'date' # TODO avoid loading to conserve memory
-require 'set' # TODO avoid loading to conserve memory
-require 'continuation' # TODO avoid loading to conserve memory
-require 'socket' # TODO avoid loading to conserve memory
 
 require 'yasl/dumper'
 require 'yasl/loader'
 
 module YASL
-  JSON_BASIC_DATA_TYPES = [NilClass, String, Integer, Float, TrueClass, FalseClass]
-  RUBY_ONLY_BASIC_DATA_TYPES = [Time, Date, Complex, Rational, Regexp, Symbol, Set, Range, Array, Hash]
+  JSON_BASIC_DATA_TYPES = ['NilClass', 'String', 'Integer', 'Float', 'TrueClass', 'FalseClass']
+  RUBY_ONLY_BASIC_DATA_TYPES = ['Time', 'Date', 'Complex', 'Rational', 'Regexp', 'Symbol', 'Set', 'Range', 'Array', 'Hash']
   RUBY_BASIC_DATA_TYPES = RUBY_ONLY_BASIC_DATA_TYPES + JSON_BASIC_DATA_TYPES
-  UNSERIALIZABLE_DATA_TYPES = [Proc, Binding, IO, File::Stat, Dir, BasicSocket, MatchData, Method, UnboundMethod, Thread, ThreadGroup, Continuation]
+  UNSERIALIZABLE_DATA_TYPES = ['Proc', 'Binding', 'IO', 'File::Stat', 'Dir', 'BasicSocket', 'MatchData', 'Method', 'UnboundMethod', 'Thread', 'ThreadGroup', 'Continuation']
   
   class << self
     def dump(object, include_classes: false)
@@ -54,8 +50,8 @@ module YASL
     private
     
     def type_in?(object, types)
-      types.reduce(false) do |result, klass|
-        result || object.is_a?(klass)
+      types.reduce(false) do |result, class_name|
+        result || object.class.ancestors.map(&:name).include?(class_name)
       end
     end
     

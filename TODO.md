@@ -2,20 +2,21 @@
 
 ## Next
 
-- Avoid loading 'date', 'set', 'continuation', & 'socket' to conserve memory by testing for related classes conditionally
+
 
 ## Future
 
-- Serialize whether a class reference is a class or module
-- Serialize whether a class reference is a struct or not
-- Materialize a class matching a non-existing class
+- Support `whitelist_classes` on load to also include basic types (people could use YASL constants to avoid typing all by hand), documenting default as YASL::RUBY_BASIC_DATA_TYPES
+- Support `whitelist_classes` on dump, ignoring other classes silently without complaining
+- Support `blacklist_classes` on dump, ignoring classes silently without complaining
 
 ## Far Off
     
+- Serialize whether a class reference is a class or module
+- Serialize whether a class reference is a struct or not
+- Materialize a class matching a non-existing class
 - Handle exception in instance variable matching class name (e.g. an attribute begins with '_data')
 
 ## Just Ideas
 
-- Designate if a class is serializable or should be ignored (serializing as nil)
-- Filter by attributes on dump
-- Filter by classes on dump
+- Filter by attributes (whitelist or blacklist) on dump

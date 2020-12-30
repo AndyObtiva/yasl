@@ -40,10 +40,15 @@ require 'yasl'
 
 To serialize, use the `YASL#dump(object)` method.
 
+Keep in mind that `YASL::UNSERIALIZABLE_DATA_TYPES` classes are unserializable, and will serialize as `nil` (feel free to add more classes that you would like filtered out):
+
+`Proc`, `Binding`, `IO`, `File::Stat`, `Dir`, `BasicSocket`, `MatchData`, `Method`, `UnboundMethod`, `Thread`, `ThreadGroup`, `Continuation`
+
 Example (from [samples/dump_basic.rb](samples/dump_basic.rb)):
 
 ```ruby
 require 'yasl'
+require 'date'
 
 class Car
   attr_accessor :make,
@@ -82,9 +87,9 @@ YASL automatically detects cycles when serializing bidirectional object referenc
 Example (from [samples/dump_cycle.rb](samples/dump_cycle.rb)):
 
 ```ruby
-$LOAD_PATH.unshift File.expand_path(File.join(__dir__, '..', 'lib'))
-
 require 'yasl'
+require 'date'
+require 'set'
 
 class Car
   attr_accessor :make,
@@ -145,12 +150,15 @@ puts dump.inspect
 
 To deserialize, use the `YASL#load(data, whitelist_classes: [])` method. The value of `whitelist_classes` must mention all classes expected to appear in the serialized data to load. This is required to ensure software security by not allowing arbitrary unexpected classes to be deserialized.
 
+By default, only `YASL::RUBY_BASIC_DATA_TYPES` classes are deserialized:
+
+`NilClass`, `String`, `Integer`, `Float`, `TrueClass`, `FalseClass`, `Time`, `Date`, `Complex`, `Rational`, `Regexp`, `Symbol`, `Set`, `Range`, `Array`, `Hash`
+
 Example (from [samples/load_basic.rb](samples/load_basic.rb)):
 
 ```ruby
-$LOAD_PATH.unshift File.expand_path(File.join(__dir__, '..', 'lib'))
-
 require 'yasl'
+require 'date'
 
 class Car
   attr_accessor :make,
@@ -214,9 +222,9 @@ YASL automatically restores cycles when deserializing bidirectional object refer
 Example (from [samples/load_cycle.rb](samples/load_cycle.rb)):
 
 ```ruby
-$LOAD_PATH.unshift File.expand_path(File.join(__dir__, '..', 'lib'))
-
 require 'yasl'
+require 'date'
+require 'set'
 
 class Car
   attr_accessor :make,

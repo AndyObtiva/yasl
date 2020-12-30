@@ -1,6 +1,8 @@
 $LOAD_PATH.unshift File.expand_path(File.join(__dir__, '..', 'lib'))
 
 require 'yasl'
+require 'date'
+require 'set'
 
 class Car
   attr_accessor :make,

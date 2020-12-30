@@ -146,9 +146,8 @@ module YASL
     def dump_struct_member_values(object)
       structure = {}
       if object.is_a?(Struct)
-        member_values = Hash[object.each_pair.to_a] if RUBY_ENGINE == 'opal'
         structure[:_struct_member_values] = object.members.reduce({}) do |member_values, member|
-          value = RUBY_ENGINE == 'opal' ? member_values[member] : object[member]
+          value = object[member]
           value.nil? || unserializable?(value) ? member_values : member_values.merge(member => dump_structure(value))
         end
         structure.delete(:_struct_member_values) if structure[:_struct_member_values].empty?
@@ -157,7 +156,7 @@ module YASL
     end
     
     def unserializable?(value)
-      result = UNSERIALIZABLE_DATA_TYPES.detect {|u_class| value.is_a?(u_class)}
+      result = UNSERIALIZABLE_DATA_TYPES.detect {|class_name| value.class.ancestors.map(&:name).include?(class_name)}
       result = ((value.is_a?(Class) || value.is_a?(Module)) && value.name.nil?) if result.nil?
       result
     end

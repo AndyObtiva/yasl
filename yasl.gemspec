@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = Gem::Requirement.new(">= 0".freeze) if s.respond_to? :required_rubygems_version=
   s.require_paths = ["lib".freeze]
   s.authors = ["Andy Maleh".freeze]
-  s.date = "2020-12-29"
+  s.date = "2020-12-30"
   s.description = "A pure Ruby serialization library that works across different Ruby implementations like Opal and JRuby as an alternative to YAML/Marshal.".freeze
   s.email = "andy.am@gmail.com".freeze
   s.extra_rdoc_files = [
@@ -20,35 +20,13 @@ Gem::Specification.new do |s|
     "README.md"
   ]
   s.files = [
-    ".coveralls.yml",
-    ".document",
-    ".github/workflows/ruby.yml",
-    ".rspec",
-    ".ruby-gemset",
-    ".ruby-version",
     "CHANGELOG.md",
-    "Gemfile",
-    "Gemfile.lock",
     "LICENSE.txt",
     "README.md",
-    "Rakefile",
-    "TODO.md",
     "VERSION",
     "lib/yasl.rb",
     "lib/yasl/dumper.rb",
     "lib/yasl/loader.rb",
-    "samples/dump_basic.rb",
-    "samples/dump_cycle.rb",
-    "samples/dump_include_classes.rb",
-    "samples/load_basic.rb",
-    "samples/load_cycle.rb",
-    "spec/fixtures/car.rb",
-    "spec/fixtures/car_struct.rb",
-    "spec/fixtures/driving.rb",
-    "spec/fixtures/driving/person.rb",
-    "spec/lib/yasl__dump__spec.rb",
-    "spec/lib/yasl__load__spec.rb",
-    "spec/spec_helper.rb",
     "yasl.gemspec"
   ]
   s.homepage = "http://github.com/AndyObtiva/yasl".freeze
