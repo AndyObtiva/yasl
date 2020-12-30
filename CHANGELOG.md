@@ -10,6 +10,7 @@
 - Serialize top-level class/module as JSON
 - Serialize cycles by using object ID references
 - Support `include_classes` option on dump
+- Silently ignore non-serializable objects like `Proc`, `Binding`, and `IO`.
 - Deserialize instance variables from JSON
 - Deserialize Class occurence in variables from JSON
 - Deserialize Module occurence in variables from JSON

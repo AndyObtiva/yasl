@@ -931,6 +931,77 @@ RSpec.describe do
       end
     end
     
+    it 'silently ignores non-serializable objects like `Proc`, `Binding`, and `IO`' do
+      dump = YASL.dump(Class.new {})
+      expect(dump).to eq("null")
+      
+      dump = YASL.dump(Module.new {})
+      expect(dump).to eq("null")
+      
+      file = File.new(__FILE__)
+      hash = {
+        proc: lambda {},
+        binding: TOPLEVEL_BINDING,
+        io: file,
+        file_stat: file.stat,
+        dir: Dir.new(__dir__),
+        basic_socket: (TCPSocket.new('www.google.com', 80) rescue lambda {}), # rescue to avoid network error hanging tests
+        anonymous_class: Class.new {},
+        anonymous_module: Module.new {},
+        match_data: //.match(''),
+        method: method(:to_s),
+        unbound_method: self.class.instance_method(:to_s),
+        thread: Thread.new {},
+        thread_group: ThreadGroup.new,
+        continuation: (callcc{|cc| $cc = cc} rescue lambda {}), # rescue to avoid alloc issue in JRuby
+        other: 'valid data',
+      }
+      
+      dump = YASL.dump(hash)
+      expect(dump).to eq("{\"_class\":\"Hash\",\"_data\":[[{\"_class\":\"Symbol\",\"_data\":\"other\"},\"valid data\"]]}")
+      
+      array = [
+        lambda {},
+        TOPLEVEL_BINDING,
+        file,
+        file.stat,
+        Dir.new(__dir__),
+        (TCPSocket.new('www.google.com', 80) rescue lambda {}), # rescue to avoid network error hanging tests
+        Class.new {},
+        Module.new {},
+        //.match(''),
+        method(:to_s),
+        self.class.instance_method(:to_s),
+        Thread.new {},
+        ThreadGroup.new,
+        (callcc{|cc| $cc = cc} rescue lambda {}),
+        'valid data',
+      ]
+      
+      dump = YASL.dump(array)
+      expect(dump).to eq("{\"_class\":\"Array\",\"_data\":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,\"valid data\"]}")
+      
+      set = Set.new(array)
+      
+      dump = YASL.dump(set)
+      expect(dump).to eq("{\"_class\":\"Set\",\"_data\":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,\"valid data\"]}")
+      
+      struct = CarStruct.new(make: lambda {})
+      struct.owner = Class.new {}
+      
+      dump = YASL.dump(struct)
+      expect(dump).to eq("{\"_class\":\"CarStruct\",\"_id\":1}")
+      
+      object = Car.new
+      object.make = lambda {}
+      object.owner = Module.new {}
+      Car.instance_variable_set(:@count, lambda {})
+      Car.class_variable_set(:@@class_count, lambda {})
+
+      dump = YASL.dump(object, include_classes: true)
+      expect(dump).to eq("{\"_class\":\"Car\",\"_id\":1,\"_classes\":[{\"_class\":\"Car\"}]}")
+    end
+    
   end
   
 end

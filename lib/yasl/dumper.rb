@@ -38,8 +38,12 @@ module YASL
     def dump_structure(object, for_classes: false)
       structure = {}
       if top_level_class?(object, for_classes)
-        structure[:_class] = object.name
-        add_to_classes(object)
+        if object.name.nil?
+          return nil
+        else
+          structure[:_class] = object.name
+          add_to_classes(object)
+        end
       elsif YASL.json_basic_data_type?(object)
         structure = object
       elsif YASL.ruby_basic_data_type?(object)
@@ -78,13 +82,17 @@ module YASL
       when Complex, Rational, Regexp, Symbol
         object.to_s
       when Set
-        object.to_a.map {|element| dump_structure(element)}
+        object.to_a.uniq.map {|element| dump_structure(element) unless unserializable?(element)}
       when Range
         [object.begin, object.end, object.exclude_end?]
       when Array
-        object.map {|element| dump_structure(element)}
+        object.map {|element| dump_structure(element) unless unserializable?(element)}
       when Hash
-        object.map {|pair| pair.map {|element| dump_structure(element)}}
+        object.reject do |key, value|
+          [key, value].detect {|element| unserializable?(element)}
+        end.map do |pair|
+          pair.map {|element| dump_structure(element)}
+        end
       end
     end
     
@@ -116,8 +124,9 @@ module YASL
       if object.respond_to?(:class_variables) && !object.class_variables.empty?
         structure[:_class_variables] = object.class_variables.reduce({}) do |class_vars, var|
           value = object.class_variable_get(var)
-          class_vars.merge(var.to_s.sub('@@', '') => dump_structure(value))
+          unserializable?(value) ? class_vars : class_vars.merge(var.to_s.sub('@@', '') => dump_structure(value))
         end
+        structure.delete(:_class_variables) if structure[:_class_variables].empty?
       end
       structure
     end
@@ -127,8 +136,9 @@ module YASL
       if !object.instance_variables.empty?
         structure[:_instance_variables] = object.instance_variables.sort.reduce({}) do |instance_vars, var|
           value = object.instance_variable_get(var)
-          instance_vars.merge(var.to_s.sub('@', '') => dump_structure(value))
+          unserializable?(value) ? instance_vars : instance_vars.merge(var.to_s.sub('@', '') => dump_structure(value))
         end
+        structure.delete(:_instance_variables) if structure[:_instance_variables].empty?
       end
       structure
     end
@@ -136,12 +146,20 @@ module YASL
     def dump_struct_member_values(object)
       structure = {}
       if object.is_a?(Struct)
+        member_values = Hash[object.each_pair.to_a] if RUBY_ENGINE == 'opal'
         structure[:_struct_member_values] = object.members.reduce({}) do |member_values, member|
-          value = object[member]
-          value.nil? ? member_values : member_values.merge(member => dump_structure(value))
+          value = RUBY_ENGINE == 'opal' ? member_values[member] : object[member]
+          value.nil? || unserializable?(value) ? member_values : member_values.merge(member => dump_structure(value))
         end
+        structure.delete(:_struct_member_values) if structure[:_struct_member_values].empty?
       end
       structure
+    end
+    
+    def unserializable?(value)
+      result = UNSERIALIZABLE_DATA_TYPES.detect {|u_class| value.is_a?(u_class)}
+      result = ((value.is_a?(Class) || value.is_a?(Module)) && value.name.nil?) if result.nil?
+      result
     end
         
     private
