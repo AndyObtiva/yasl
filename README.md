@@ -15,7 +15,7 @@ A pure Ruby serialization library that works across different Ruby implementatio
 - Silently ignore non-serializable objects (unlike Marshal), such as `Proc`, `Binding`, and `IO`.
 - No special performance requirements. No high throughput usage. Average Internet speeds.
 - Ensure system safety through secure deserialization.
-- JSON encoding is good enough. No need for premature optimization. 
+- JSON encoding is good enough. No need for premature optimization.
 
 ## Usage Instructions
 
@@ -26,7 +26,7 @@ Run:
 Or add to Gemfile:
 
 ```ruby
-gem 'yasl', '~> 0.1.0'
+gem 'yasl', '~> 0.2.0'
 ```
 
 And, run:
@@ -304,6 +304,18 @@ puts car2.owner.cars.inspect
 puts car2.inspect
 # => #<Car:0x00007ffdf008e120 @make="Mitsubishi", @model="Eclipse", @year="2002", @owner=#<Person:0x00007ffdf008dc20 @name="Sean Hux", @dob=2017-10-17 10:03:04 -0400, @cars=[#<Car:0x00007ffdf008e120 ...>]>>
 ```
+
+### Struct
+
+Struct serialization/deserialization works out of the box in standard [MRI Ruby](https://www.ruby-lang.org/) and [JRuby](https://www.jruby.org/).
+
+To avoid some JS and `keyword_init` issues with `Struct` in [Opal](https://opalrb.com/), you may use the optional pure Ruby Struct re-implementation that comes with YASL:
+
+```ruby
+require 'yasl/ext/struct'
+```
+
+This ensures successful serialization in YASL.
 
 ## Contributing
 

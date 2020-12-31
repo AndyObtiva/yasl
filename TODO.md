@@ -2,11 +2,13 @@
 
 ## Next
 
-- Support deserialization fallbacks of instance variables for Struct member values and vice versa
-- Make `whitelist_classes` work with string class names
 - Make `YASL::UNSERIALIZABLE_DATA_TYPES` work with regular classes too
+- Make load `whitelist_classes` work with string class names
+- Support deserialization fallbacks of instance variables for Struct member values and vice versa
 - Refactor to improve maintainability score
-- Include optional pure Ruby reimplementaiton of Struct to avoid JS issues in Opal Struct when needed
+
+## Soon
+
 
 ## Future
 
@@ -22,4 +24,5 @@
 ## Just Ideas
 
 - Filter by attributes (whitelist or blacklist) on dump
+- Filter by attributes globally
 - Limit number of lifetime deserialized symbols to prevent symbol DOS attacks in a programmer friendly way without requiring them to know all symbols in advance, which can be very impractical

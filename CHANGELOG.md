@@ -4,6 +4,7 @@
 
 - Support Boolean serialization in Opal (instead of TrueClass and FalseClass)
 - Support BigDecimal serialization
+- Include optional pure Ruby reimplementaiton of Struct to avoid JS issues in Opal Struct when needed
 - Fix issue with dumping not working when some ruby basic data type libraries (e.g. 'date') are not loaded by comparing to class name string instead of actual class object
 
 ## 0.1.0
