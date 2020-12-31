@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.2.0
+
+- Support Boolean serialization in Opal (instead of TrueClass and FalseClass)
+
 ## 0.1.0
 
 - Serialize JSON basic data types

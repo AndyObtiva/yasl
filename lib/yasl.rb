@@ -25,7 +25,7 @@ require 'yasl/dumper'
 require 'yasl/loader'
 
 module YASL
-  JSON_BASIC_DATA_TYPES = ['NilClass', 'String', 'Integer', 'Float', 'TrueClass', 'FalseClass']
+  JSON_BASIC_DATA_TYPES = ['NilClass', 'String', 'Integer', 'Float', 'TrueClass', 'FalseClass', 'Boolean']
   RUBY_ONLY_BASIC_DATA_TYPES = ['Time', 'Date', 'Complex', 'Rational', 'Regexp', 'Symbol', 'Set', 'Range', 'Array', 'Hash']
   RUBY_BASIC_DATA_TYPES = RUBY_ONLY_BASIC_DATA_TYPES + JSON_BASIC_DATA_TYPES
   UNSERIALIZABLE_DATA_TYPES = ['Proc', 'Binding', 'IO', 'File::Stat', 'Dir', 'BasicSocket', 'MatchData', 'Method', 'UnboundMethod', 'Thread', 'ThreadGroup', 'Continuation']
