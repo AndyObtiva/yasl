@@ -85,6 +85,8 @@ module YASL
       case class_name
       when 'Time'
         DateTime.new.marshal_load(data.map(&:to_r)).to_time
+      when 'BigDecimal'
+        BigDecimal(data)
       when 'Date'
         Date.new.marshal_load(data.map(&:to_r))
       when 'DateTime'

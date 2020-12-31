@@ -115,6 +115,7 @@ require 'puts_debuggerer'
 require 'yasl'
 
 require 'equalizer'
+require 'bigdecimal'
 require 'date'
 require 'set'
 require 'continuation'

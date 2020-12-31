@@ -9,6 +9,7 @@ RSpec.describe do
       car.registration_time = Time.new(2003, 10, 19, 10, 39, 37.092, '-03:00')
       car.registration_date = Date.new(2003, 10, 19)
       car.registration_date_time = DateTime.new(2003, 10, 19, 10, 39, 37.092, '-03:00')
+      car.big_decimal_number = BigDecimal('94.38')
       car.complex_number = Complex(2,37)
       car.complex_polar_number = Complex.polar(-23,28)
       car.rational_number = Rational(22/7)
@@ -55,6 +56,7 @@ RSpec.describe do
       car.registration_time = Time.new(2003, 10, 19, 10, 39, 37.092, '-03:00')
       car.registration_date = Date.new(2003, 10, 19)
       car.registration_date_time = DateTime.new(2003, 10, 19, 10, 39, 37.092, '-03:00')
+      car.big_decimal_number = BigDecimal('94.38')
       car.complex_number = Complex(2,37)
       car.complex_polar_number = Complex.polar(-23,28)
       car.rational_number = Rational(22/7)
@@ -224,6 +226,10 @@ RSpec.describe do
               _class: 'DateTime',
               _data: car1.registration_date_time.marshal_dump
             },
+            big_decimal_number: {
+              _class: 'BigDecimal',
+              _data: '0.9438e2',
+            },
             complex_number: {
               _class: 'Complex',
               _data: car1.complex_number.to_s
@@ -379,6 +385,10 @@ RSpec.describe do
             registration_date_time: {
               _class: 'DateTime',
               _data: car_struct1.registration_date_time.marshal_dump
+            },
+            big_decimal_number: {
+              _class: 'BigDecimal',
+              _data: '0.9438e2',
             },
             complex_number: {
               _class: 'Complex',

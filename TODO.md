@@ -2,7 +2,6 @@
 
 ## Next
 
-- Support BigDecimal serialization
 - Support deserialization fallbacks of instance variables for Struct member values and vice versa
 - Make `whitelist_classes` work with string class names
 - Make `YASL::UNSERIALIZABLE_DATA_TYPES` work with regular classes too

@@ -34,6 +34,7 @@ class Car
     :registration_time,
     :registration_date,
     :registration_date_time,
+    :big_decimal_number,
     :complex_number,
     :complex_polar_number,
     :rational_number,

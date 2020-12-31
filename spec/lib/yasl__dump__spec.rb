@@ -9,6 +9,7 @@ RSpec.describe do
       car.registration_time = Time.new(2003, 10, 19, 10, 39, 37.092, '-03:00')
       car.registration_date = Date.new(2003, 10, 19)
       car.registration_date_time = DateTime.new(2003, 10, 19, 10, 39, 37.092, '-03:00')
+      car.big_decimal_number = BigDecimal('94.38')
       car.complex_number = Complex(2,37)
       car.complex_polar_number = Complex.polar(-23,28)
       car.rational_number = Rational(22/7)
@@ -55,6 +56,7 @@ RSpec.describe do
       car.registration_time = Time.new(2003, 10, 19, 10, 39, 37.092, '-03:00')
       car.registration_date = Date.new(2003, 10, 19)
       car.registration_date_time = DateTime.new(2003, 10, 19, 10, 39, 37.092, '-03:00')
+      car.big_decimal_number = BigDecimal('94.38')
       car.complex_number = Complex(2,37)
       car.complex_polar_number = Complex.polar(-23,28)
       car.rational_number = Rational(22/7)
@@ -194,86 +196,90 @@ RSpec.describe do
     
     context 'Ruby objects and basic data types' do
       it 'serializes instance variables of all Ruby basic data types' do
-#         dump = YASL.dump(car1, include_classes: true)
-#
-#         expected_dump = JSON.dump(
-#           _class: car1.class.name,
-#           _id: 1,
-#           _instance_variables: {
-#             class_attribute: {
-#               _class: 'Car',
-#             },
-#             complex_number: {
-#               _class: 'Complex',
-#               _data: car1.complex_number.to_s
-#             },
-#             complex_polar_number: {
-#               _class: 'Complex',
-#               _data: car1.complex_polar_number.to_s
-#             },
-#             make: car1.make,
-#             model: car1.model,
-#             module_attribute: {
-#               _class: 'Driving',
-#             },
-#             range: {
-#               _class: 'Range',
-#               _data: [car1.range.begin, car1.range.end, car1.range.exclude_end?]
-#             },
-#             range_exclusive: {
-#               _class: 'Range',
-#               _data: [car1.range_exclusive.begin, car1.range_exclusive.end, car1.range_exclusive.exclude_end?]
-#             },
-#             rational_number: {
-#               _class: 'Rational',
-#               _data: car1.rational_number.to_s
-#             },
-#             regex: {
-#               _class: 'Regexp',
-#               _data: car1.regex.to_s
-#             },
-#             registration_date: {
-#               _class: 'Date',
-#               _data: car1.registration_date.marshal_dump
-#             },
-#             registration_date_time: {
-#               _class: 'DateTime',
-#               _data: car1.registration_date_time.marshal_dump
-#             },
-#             registration_time: {
-#               _class: 'Time',
-#               _data: car1.registration_time.to_datetime.marshal_dump
-#             },
-#             set: {
-#               _class: 'Set',
-#               _data: [
-#                 1,
-#                 {
-#                   :_class => "Symbol",
-#                   :_data => "b"
-#                 },
-#                 3.7
-#               ]
-#             },
-#             symbol: {
-#               _class: 'Symbol',
-#               _data: car1.symbol.to_s
-#             },
-#             year: car1.year,
-#           },
-#           _classes: [
-#             {
-#               _class: car2.class.name,
-#               _class_variables: {
-#                 class_count: 1,
-#               },
-#               _instance_variables: {
-#                 count: 1,
-#               },
-#             },
-#           ],
-#         )
-#         expect(dump).to eq(expected_dump)
+        dump = YASL.dump(car1, include_classes: true)
+
+        expected_dump = JSON.dump(
+          _class: car1.class.name,
+          _id: 1,
+          _instance_variables: {
+            big_decimal_number: {
+              _class: 'BigDecimal',
+              _data: '0.9438e2',
+            },
+            class_attribute: {
+              _class: 'Car',
+            },
+            complex_number: {
+              _class: 'Complex',
+              _data: car1.complex_number.to_s
+            },
+            complex_polar_number: {
+              _class: 'Complex',
+              _data: car1.complex_polar_number.to_s
+            },
+            make: car1.make,
+            model: car1.model,
+            module_attribute: {
+              _class: 'Driving',
+            },
+            range: {
+              _class: 'Range',
+              _data: [car1.range.begin, car1.range.end, car1.range.exclude_end?]
+            },
+            range_exclusive: {
+              _class: 'Range',
+              _data: [car1.range_exclusive.begin, car1.range_exclusive.end, car1.range_exclusive.exclude_end?]
+            },
+            rational_number: {
+              _class: 'Rational',
+              _data: car1.rational_number.to_s
+            },
+            regex: {
+              _class: 'Regexp',
+              _data: car1.regex.to_s
+            },
+            registration_date: {
+              _class: 'Date',
+              _data: car1.registration_date.marshal_dump
+            },
+            registration_date_time: {
+              _class: 'DateTime',
+              _data: car1.registration_date_time.marshal_dump
+            },
+            registration_time: {
+              _class: 'Time',
+              _data: car1.registration_time.to_datetime.marshal_dump
+            },
+            set: {
+              _class: 'Set',
+              _data: [
+                1,
+                {
+                  :_class => "Symbol",
+                  :_data => "b"
+                },
+                3.7
+              ]
+            },
+            symbol: {
+              _class: 'Symbol',
+              _data: car1.symbol.to_s
+            },
+            year: car1.year,
+          },
+          _classes: [
+            {
+              _class: car2.class.name,
+              _class_variables: {
+                class_count: 1,
+              },
+              _instance_variables: {
+                count: 1,
+              },
+            },
+          ],
+        )
+        expect(dump).to eq(expected_dump)
         
         dump = YASL.dump(car1) # include_classes: false
         
@@ -281,6 +287,10 @@ RSpec.describe do
           _class: car1.class.name,
           _id: 1,
           _instance_variables: {
+            big_decimal_number: {
+              _class: 'BigDecimal',
+              _data: '0.9438e2',
+            },
             class_attribute: {
               _class: 'Car',
             },
@@ -439,6 +449,10 @@ RSpec.describe do
             registration_date_time: {
               _class: 'DateTime',
               _data: car_struct1.registration_date_time.marshal_dump
+            },
+            big_decimal_number: {
+              _class: 'BigDecimal',
+              _data: '0.9438e2',
             },
             complex_number: {
               _class: 'Complex',

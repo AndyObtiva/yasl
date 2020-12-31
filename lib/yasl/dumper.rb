@@ -75,19 +75,19 @@ module YASL
     
     def dump_ruby_basic_data_type_data(object)
       case object
-      when Time
+      when class_ancestor_names_include?('Time')
         object.to_datetime.marshal_dump
-      when Date
+      when class_ancestor_names_include?('Date')
         object.marshal_dump
-      when Complex, Rational, Regexp, Symbol
+      when class_ancestor_names_include?('Complex', 'Rational', 'Regexp', 'Symbol', 'BigDecimal')
         object.to_s
-      when Set
+      when class_ancestor_names_include?('Set')
         object.to_a.uniq.map {|element| dump_structure(element) unless unserializable?(element)}
-      when Range
+      when class_ancestor_names_include?('Range')
         [object.begin, object.end, object.exclude_end?]
-      when Array
+      when class_ancestor_names_include?('Array')
         object.map {|element| dump_structure(element) unless unserializable?(element)}
-      when Hash
+      when class_ancestor_names_include?('Hash')
         object.reject do |key, value|
           [key, value].detect {|element| unserializable?(element)}
         end.map do |pair|
@@ -188,6 +188,14 @@ module YASL
       class_objects[object_class].index(object) + 1
     end
         
+    def class_ancestor_names_include?(*class_names)
+      lambda do |object|
+        class_names.reduce(false) do |result, class_name|
+          result || object.class.ancestors.map(&:name).include?(class_name)
+        end
+      end
+    end
+    
   end
   
 end

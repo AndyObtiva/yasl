@@ -3,6 +3,8 @@
 ## 0.2.0
 
 - Support Boolean serialization in Opal (instead of TrueClass and FalseClass)
+- Support BigDecimal serialization
+- Fix issue with dumping not working when some ruby basic data type libraries (e.g. 'date') are not loaded by comparing to class name string instead of actual class object
 
 ## 0.1.0
 
