@@ -11,7 +11,7 @@ A pure Ruby serialization library that works across different Ruby implementatio
 ## Requirements
 
 - Portablity across different Ruby implementations, especially [Opal](https://opalrb.com/) in the web browser and [JRuby](https://www.jruby.org/).
-- Zero required configuration. Developers are too busy solving business domain problems to worry about low-level serialization details.
+- Zero required configuration. Developers are too busy solving business domain problems to worry about low-level serialization details (no mucking around `as_json` methods and serializer classes).
 - Silently ignore non-serializable objects (unlike Marshal), such as `Proc`, `Binding`, and `IO`.
 - No special performance requirements. No high throughput usage. Average Internet speeds.
 - Ensure system safety through secure deserialization.
@@ -315,8 +315,6 @@ To avoid some JS and `keyword_init` issues with `Struct` in [Opal](https://opalr
 require 'yasl/ext/struct'
 ```
 
-This ensures successful serialization in YASL.
-
 ## Contributing
 
 -   Check out the latest master to make sure the feature hasn't been
@@ -332,6 +330,10 @@ This ensures successful serialization in YASL.
     you want to have your own version, or is otherwise necessary, that
     is fine, but please isolate to its own commit so I can cherry-pick
     around it.
+
+## Software Process
+
+[Glimmer Process](https://github.com/AndyObtiva/glimmer/blob/master/PROCESS.md)
 
 ## TODO
 

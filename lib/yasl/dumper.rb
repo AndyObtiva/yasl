@@ -74,20 +74,28 @@ module YASL
     end
     
     def dump_ruby_basic_data_type_data(object)
+      class_ancestors_names_include = lambda do |*class_names|
+        lambda do |object|
+          class_names.reduce(false) do |result, class_name|
+            result || object.class.ancestors.map(&:name).include?(class_name)
+          end
+        end
+      end
+
       case object
-      when class_ancestor_names_include?('Time')
+      when class_ancestors_names_include['Time']
         object.to_datetime.marshal_dump
-      when class_ancestor_names_include?('Date')
+      when class_ancestors_names_include['Date']
         object.marshal_dump
-      when class_ancestor_names_include?('Complex', 'Rational', 'Regexp', 'Symbol', 'BigDecimal')
+      when class_ancestors_names_include['Complex', 'Rational', 'Regexp', 'Symbol', 'BigDecimal']
         object.to_s
-      when class_ancestor_names_include?('Set')
+      when class_ancestors_names_include['Set']
         object.to_a.uniq.map {|element| dump_structure(element) unless unserializable?(element)}
-      when class_ancestor_names_include?('Range')
+      when class_ancestors_names_include['Range']
         [object.begin, object.end, object.exclude_end?]
-      when class_ancestor_names_include?('Array')
+      when class_ancestors_names_include['Array']
         object.map {|element| dump_structure(element) unless unserializable?(element)}
-      when class_ancestor_names_include?('Hash')
+      when class_ancestors_names_include['Hash']
         object.reject do |key, value|
           [key, value].detect {|element| unserializable?(element)}
         end.map do |pair|
@@ -188,14 +196,6 @@ module YASL
       class_objects[object_class].index(object) + 1
     end
         
-    def class_ancestor_names_include?(*class_names)
-      lambda do |object|
-        class_names.reduce(false) do |result, class_name|
-          result || object.class.ancestors.map(&:name).include?(class_name)
-        end
-      end
-    end
-    
   end
   
 end

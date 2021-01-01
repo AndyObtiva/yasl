@@ -133,10 +133,6 @@ module YASL
       structure && structure.is_a?(Hash) && structure['_class'] && structure['_id'].nil? && structure['_instance_variables'].nil? && structure['_class_variables'].nil? && structure['_struct_member_values'].nil? && structure['_data'].nil?
     end
     
-    def add_to_classes(object)
-      classes << object unless classes.include?(object)
-    end
-    
     def class_objects_for(object_class)
       class_objects[object_class] ||= {}
     end
