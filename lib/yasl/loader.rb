@@ -70,7 +70,12 @@ module YASL
       end
       structure['_struct_member_values'].to_a.each do |member, value|
         value = load_structure(value)
-        object[member.to_sym] = value
+        begin
+          object[member.to_sym] = value
+        rescue => e
+          puts "#{e.message}. Setting `@#{member}` instance variable instead."
+          object.instance_variable_set("@#{member}".to_sym, value)
+        end
       end
       structure['_class_variables'].to_a.each do |class_var, value|
         value = load_structure(value)
@@ -120,7 +125,7 @@ module YASL
       object_class = class_name_components.reduce(Object) do |result_class, class_name|
         result_class.const_get(class_name)
       end
-      if !@whitelist_classes.map(&:to_s).include?(object_class.to_s)
+      if ![@whitelist_classes].compact.flatten.map(&:to_s).include?(object_class.to_s)
         raise "Class `#{class_name}` is not mentioned in `whitelist_classes` (e.g. `YASL.load(data, whitelist_classes: [#{class_name}])`)!"
       end
       object_class

@@ -2,7 +2,6 @@
 
 ## Next
 
-- Support deserialization fallbacks of instance variables for Struct member values and vice versa
 - Refactor to improve maintainability score
 
 ## Soon

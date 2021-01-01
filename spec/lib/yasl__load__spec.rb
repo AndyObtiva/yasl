@@ -484,6 +484,21 @@ RSpec.describe do
         expect(Driving::Person.count).to eq(1)
         expect(Driving::Person.class_count).to eq(1)
       end
+      
+      it 'tolerates deserializing instance variables into struct members' do
+        data = JSON.dump(
+          _class: 'Car',
+          _id: 1,
+          _struct_member_values: {
+            make: car1.make,
+          }
+        )
+        
+        object = YASL.load(data, whitelist_classes: 'Car')
+        
+        expect(object).to be_a(Car)
+        expect(object.make).to eq(car1.make)
+      end
     end
     
     it 'deserializes array containing non-JSON basic data type objects' do
