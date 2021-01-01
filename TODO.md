@@ -2,7 +2,6 @@
 
 ## Next
 
-- Refactor to improve maintainability score
 
 ## Soon
 

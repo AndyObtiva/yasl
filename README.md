@@ -26,7 +26,7 @@ Run:
 Or add to Gemfile:
 
 ```ruby
-gem 'yasl', '~> 0.2.0'
+gem 'yasl', '~> 0.2.1'
 ```
 
 And, run:
