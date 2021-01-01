@@ -36,6 +36,7 @@ module YASL
     end
     
     def dump_structure(object, for_classes: false)
+      return if unserializable?(object)
       structure = {}
       if top_level_class?(object, for_classes)
         if object.name.nil?
@@ -164,7 +165,7 @@ module YASL
     end
     
     def unserializable?(value)
-      result = UNSERIALIZABLE_DATA_TYPES.detect {|class_name| value.class.ancestors.map(&:name).include?(class_name)}
+      result = UNSERIALIZABLE_DATA_TYPES.detect {|class_name| value.class.ancestors.map(&:name).include?(class_name.to_s)}
       result = ((value.is_a?(Class) || value.is_a?(Module)) && value.name.nil?) if result.nil?
       result
     end

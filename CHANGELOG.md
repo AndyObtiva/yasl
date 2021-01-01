@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.2.1
+
+- Make `YASL::UNSERIALIZABLE_DATA_TYPES` work with regular classes too
+
 ## 0.2.0
 
 - Support Boolean serialization in Opal (instead of TrueClass and FalseClass)

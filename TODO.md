@@ -2,7 +2,6 @@
 
 ## Next
 
-- Make `YASL::UNSERIALIZABLE_DATA_TYPES` work with regular classes too
 - Make load `whitelist_classes` work with string class names
 - Support deserialization fallbacks of instance variables for Struct member values and vice versa
 - Refactor to improve maintainability score
