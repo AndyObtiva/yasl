@@ -2,6 +2,8 @@
 
 ## Next
 
+- Document Ruby API methods for doc generators
+
 
 ## Soon
 

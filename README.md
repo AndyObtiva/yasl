@@ -26,7 +26,7 @@ Run:
 Or add to Gemfile:
 
 ```ruby
-gem 'yasl', '~> 0.2.1'
+gem 'yasl', '~> 0.2.2'
 ```
 
 And, run:
@@ -309,10 +309,20 @@ puts car2.inspect
 
 Struct serialization/deserialization works out of the box in standard [MRI Ruby](https://www.ruby-lang.org/) and [JRuby](https://www.jruby.org/).
 
-To avoid some JS and `keyword_init` issues with `Struct` in [Opal](https://opalrb.com/), you may use the optional pure Ruby Struct re-implementation that comes with YASL:
+`Struct` in [Opal](https://opalrb.com/) has some odd JS issues and `keyword_init` gotchas unrelated to YASL. To completely avoid these issues, you may use the optional pure Ruby `Struct` re-implementation in the [pure-struct](https://github.com/AndyObtiva/pure-struct) gem:
 
 ```ruby
-require 'yasl/ext/struct'
+require 'pure-struct' # depends on installing the [pure-struct](https://github.com/AndyObtiva/pure-struct) gem
+require 'yasl'
+```
+
+Optionally, you may code block by the specific [Ruby](https://www.ruby-lang.org/) engine where it is needed (e.g. [Opal](https://opalrb.com/)):
+
+```ruby
+if RUBY_ENGINE == 'opal'
+  require 'pure-struct'
+end
+require 'yasl'
 ```
 
 ## Contributing

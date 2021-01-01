@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.2.2
+
+- Extracted pure Ruby re-implementation of Struct into the [pure-struct](https://github.com/AndyObtiva/pure-struct) gem.
+
 ## 0.2.1
 
 - Make `YASL::UNSERIALIZABLE_DATA_TYPES` work with regular classes too

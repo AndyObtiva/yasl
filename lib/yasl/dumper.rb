@@ -72,7 +72,9 @@ module YASL
     
     def dump_ruby_basic_data_type_data(obj)
       class_ancestors_names_include = lambda do |*class_names|
-        lambda { |obj| class_names.any? { |class_name| obj.class.ancestors.map(&:name).include?(class_name) } }
+        lambda do |object|
+          class_names.any? { |class_name| obj.class.ancestors.map(&:name).include?(class_name) }
+        end
       end
       case obj
       when class_ancestors_names_include['Time']
