@@ -294,7 +294,7 @@ RSpec.describe do
         expect(Car.count).to_not eq(1)
         expect(Car.class_count).to_not eq(1)
         
-        object = YASL.load(data, whitelist_classes: whitelist_classes, include_classes: true)
+        object = YASL.load(data, whitelist_classes: whitelist_classes.map(&:to_s), include_classes: true)
         
         expect(object).to eq(car1)
         expect(Car.count).to eq(1)
@@ -349,7 +349,7 @@ RSpec.describe do
           ],
         )
         
-        object = YASL.load(data, whitelist_classes: whitelist_classes)
+        object = YASL.load(data, whitelist_classes: whitelist_classes.map(&:to_s)) # test that string class names work too
         expect(object).to eq(car2)
         expect(Car.count).to_not eq(1)
         expect(Car.class_count).to_not eq(1)

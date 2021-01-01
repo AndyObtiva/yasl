@@ -120,7 +120,7 @@ module YASL
       object_class = class_name_components.reduce(Object) do |result_class, class_name|
         result_class.const_get(class_name)
       end
-      if !@whitelist_classes.include?(object_class)
+      if !@whitelist_classes.map(&:to_s).include?(object_class.to_s)
         raise "Class `#{class_name}` is not mentioned in `whitelist_classes` (e.g. `YASL.load(data, whitelist_classes: [#{class_name}])`)!"
       end
       object_class

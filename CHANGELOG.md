@@ -3,6 +3,7 @@
 ## 0.2.1
 
 - Make `YASL::UNSERIALIZABLE_DATA_TYPES` work with regular classes too
+- Make load `whitelist_classes` work with string class names
 
 ## 0.2.0
 
