@@ -24,10 +24,8 @@ Object.send(:remove_const, :Struct) if Object.constants.include?(:Struct)
 # Optional re-implmentation of Struct in Pure Ruby (to get around JS issues in Opal Struct)
 class Struct
   class << self
-    def new(*class_name_and_or_attributes, keyword_init: false)
-      class_name = class_name_and_or_attributes.shift if class_name_and_or_attributes.first.to_s.chars.first.to_s.upcase?
-      attributes = class_name_and_or_attributes.compact.map(&:to_s).map(&:to_sym)
-      struct_class = Class.new do
+    CLASS_DEFINITION_FOR_ATTRIBUTES = lambda do |attributes, keyword_init|
+      lambda do |defined_class|
         members_array = attributes
         
         define_method(:members) do
@@ -72,16 +70,23 @@ class Struct
         end
         
         def select(&block)
-          @to_a.select(&block)
+          to_a.select(&block)
         end
         
         def eql?(other)
-          instance_of?(other.class) && members.all? { |key| __send__(key).public_send(:eql?, other.__send__(key)) }
+          instance_of?(other.class) &&
+            members.all? { |key| self[key].eql?(other[key]) }
         end
         
         def ==(other)
           other = coerce(other).first if respond_to?(:coerce, true)
-          other.kind_of?(self.class) && members.all? { |key| __send__(key).public_send(:==, other.__send__(key)) }
+          other.kind_of?(self.class) &&
+            members.all? { |key| self[key] == other[key] }
+        end
+        
+        def hash
+          self.class.hash +
+            to_a.each_with_index.map {|value, i| (i+1) * value.hash}.sum
         end
         
         if keyword_init
@@ -117,11 +122,27 @@ class Struct
           end
         end
       end
-      if class_name.nil?
-        struct_class
-      else
-        const_set(class_name, struct_class)
+    end
+    
+    ARG_VALIDATION = lambda do |class_name_or_attribute, *attributes|
+      class_name_or_attribute.nil? || attributes.any?(&:nil?)
+    end
+    
+    CLASS_NAME_EXTRACTION = lambda do |class_name_or_attribute|
+      if class_name_or_attribute.is_a?(String)
+        raise NameError, "identifier name needs to be constant" unless class_name_or_attribute.match(/^[A-Z]/)
+        class_name_or_attribute
       end
     end
+    
+    def new(class_name_or_attribute, *attributes, keyword_init: false)
+      raise 'Arguments cannot be nil' if ARG_VALIDATION[class_name_or_attribute, *attributes]
+      class_name = CLASS_NAME_EXTRACTION[class_name_or_attribute]
+      attributes.unshift(class_name_or_attribute) if class_name.nil?
+      attributes = attributes.map(&:to_sym)
+      struct_class = Class.new(&CLASS_DEFINITION_FOR_ATTRIBUTES[attributes, keyword_init])
+      class_name.nil? ? struct_class : const_set(class_name, struct_class)
+    end
+      
   end
 end

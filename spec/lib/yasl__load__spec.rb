@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe do
+RSpec.describe YASL do
   let(:car1) {
     Car.new.tap do |car|
       car.make = 'Mitsubishi'

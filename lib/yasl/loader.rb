@@ -46,14 +46,22 @@ module YASL
         class_for(structure['_class'])
       elsif YASL.json_basic_data_type?(structure) && !(structure.is_a?(String) && structure.start_with?('_'))
         structure
-      elsif (structure['_class'] && (structure['_data'] || !structure.keys.detect {|key| key.start_with?('_') && key != '_class'} ))
+      elsif ruby_basic_data_type_structure?(structure)
         load_ruby_basic_data_type_object(structure['_class'], structure['_data'])
-      elsif structure['_class'] && (structure['_id'] || structure['_instance_variables'] || structure['_class_variables'] || structure['_struct_member_values'])
+      elsif load_non_basic_data_type_structure?(structure)
         load_non_basic_data_type_object(structure)
       end
     end
     
     private
+    
+    def ruby_basic_data_type_structure?(structure)
+      (structure['_class'] && (structure['_data'] || !structure.keys.detect {|key| key.start_with?('_') && key != '_class'} ))
+    end
+    
+    def load_non_basic_data_type_structure?(structure)
+      structure['_class'] && (structure['_id'] || structure['_instance_variables'] || structure['_class_variables'] || structure['_struct_member_values'])
+    end
     
     def load_non_basic_data_type_object(structure, for_classes: false)
       class_name = structure['_class']
@@ -62,25 +70,11 @@ module YASL
       object = object_for_id(object_class, structure['_id'])
       if object.nil?
         object = for_classes ? object_class : object_class.new
-        add_to_class_array(object, structure['_id']) if !object.is_a?(Class) && !object.is_a?(Module)
+        add_to_class_array(object, structure['_id'])
       end
-      structure['_instance_variables'].to_a.each do |instance_var, value|
-        value = load_structure(value)
-        object.instance_variable_set("@#{instance_var}".to_sym, value)
-      end
-      structure['_struct_member_values'].to_a.each do |member, value|
-        value = load_structure(value)
-        begin
-          object[member.to_sym] = value
-        rescue => e
-          puts "#{e.message}. Setting `@#{member}` instance variable instead."
-          object.instance_variable_set("@#{member}".to_sym, value)
-        end
-      end
-      structure['_class_variables'].to_a.each do |class_var, value|
-        value = load_structure(value)
-        object.class_variable_set("@@#{class_var}".to_sym, value)
-      end
+      structure['_class_variables'].to_a.each { |class_var, value| object.class_variable_set("@@#{class_var}".to_sym, load_structure(value)) }
+      structure['_instance_variables'].to_a.each { |instance_var, value| object.instance_variable_set("@#{instance_var}".to_sym, load_structure(value)) }
+      structure['_struct_member_values'].to_a.each { |member, value| load_struct_member_value(object, member, value) }
       object
     ensure
       object_class&.define_method(:initialize, object_class.instance_method(:initialize_without_yasl))
@@ -111,9 +105,7 @@ module YASL
       when 'Array'
         data.map {|element| load_structure(element)}
       when 'Hash'
-        data.reduce({}) do |new_hash, pair|
-          new_hash.merge(load_structure(pair.first) => load_structure(pair.last))
-        end
+        data.reduce({}) { |new_hash, pair| new_hash.merge(load_structure(pair.first) => load_structure(pair.last)) }
       end
     end
     
@@ -149,11 +141,20 @@ module YASL
     end
     
     def add_to_class_array(object, class_object_id)
-      return if class_object_id.nil?
+      return if object.is_a?(Class) || object.is_a?(Module) || class_object_id.nil?
       object_class = object.class
       found_object = object_for_id(object_class, class_object_id)
       class_objects_for(object_class)[class_object_id.to_i] = object unless found_object
     end
             
+    def load_struct_member_value(object, member, value)
+      value = load_structure(value)
+      begin
+        object[member.to_sym] = value
+      rescue => e
+        puts "#{e.message}. Setting `@#{member}` instance variable instead."
+        object.instance_variable_set("@#{member}".to_sym, value)
+      end
+    end
   end
 end

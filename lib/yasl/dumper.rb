@@ -39,12 +39,8 @@ module YASL
       return if unserializable?(object)
       structure = {}
       if top_level_class?(object, for_classes)
-        if object.name.nil?
-          return nil
-        else
-          structure[:_class] = object.name
-          add_to_classes(object)
-        end
+        structure[:_class] = object.name
+        add_to_classes(object)
       elsif YASL.json_basic_data_type?(object)
         structure = object
       elsif YASL.ruby_basic_data_type?(object)
@@ -74,30 +70,25 @@ module YASL
       dump_structure(klass, for_classes: true) unless klass.class_variables.empty? && klass.instance_variables.empty?
     end
     
-    def dump_ruby_basic_data_type_data(object)
+    def dump_ruby_basic_data_type_data(obj)
       class_ancestors_names_include = lambda do |*class_names|
-        lambda do |object|
-          class_names.reduce(false) do |result, class_name|
-            result || object.class.ancestors.map(&:name).include?(class_name)
-          end
-        end
+        lambda { |obj| class_names.any? { |class_name| obj.class.ancestors.map(&:name).include?(class_name) } }
       end
-
-      case object
+      case obj
       when class_ancestors_names_include['Time']
-        object.to_datetime.marshal_dump
+        obj.to_datetime.marshal_dump
       when class_ancestors_names_include['Date']
-        object.marshal_dump
+        obj.marshal_dump
       when class_ancestors_names_include['Complex', 'Rational', 'Regexp', 'Symbol', 'BigDecimal']
-        object.to_s
+        obj.to_s
       when class_ancestors_names_include['Set']
-        object.to_a.uniq.map {|element| dump_structure(element) unless unserializable?(element)}
+        obj.to_a.uniq.map {|element| dump_structure(element)}
       when class_ancestors_names_include['Range']
-        [object.begin, object.end, object.exclude_end?]
+        [obj.begin, obj.end, obj.exclude_end?]
       when class_ancestors_names_include['Array']
-        object.map {|element| dump_structure(element) unless unserializable?(element)}
+        obj.map {|element| dump_structure(element)}
       when class_ancestors_names_include['Hash']
-        object.reject do |key, value|
+        obj.reject do |key, value|
           [key, value].detect {|element| unserializable?(element)}
         end.map do |pair|
           pair.map {|element| dump_structure(element)}
@@ -131,10 +122,7 @@ module YASL
     def dump_class_variables(object)
       structure = {}
       if object.respond_to?(:class_variables) && !object.class_variables.empty?
-        structure[:_class_variables] = object.class_variables.reduce({}) do |class_vars, var|
-          value = object.class_variable_get(var)
-          unserializable?(value) ? class_vars : class_vars.merge(var.to_s.sub('@@', '') => dump_structure(value))
-        end
+        structure[:_class_variables] = dump_class_variables_hash(object)
         structure.delete(:_class_variables) if structure[:_class_variables].empty?
       end
       structure
@@ -143,10 +131,7 @@ module YASL
     def dump_instance_variables(object)
       structure = {}
       if !object.instance_variables.empty?
-        structure[:_instance_variables] = object.instance_variables.sort.reduce({}) do |instance_vars, var|
-          value = object.instance_variable_get(var)
-          unserializable?(value) ? instance_vars : instance_vars.merge(var.to_s.sub('@', '') => dump_structure(value))
-        end
+        structure[:_instance_variables] = dump_instance_variables_hash(object)
         structure.delete(:_instance_variables) if structure[:_instance_variables].empty?
       end
       structure
@@ -155,10 +140,7 @@ module YASL
     def dump_struct_member_values(object)
       structure = {}
       if object.is_a?(Struct)
-        structure[:_struct_member_values] = object.members.reduce({}) do |member_values, member|
-          value = object[member]
-          value.nil? || unserializable?(value) ? member_values : member_values.merge(member => dump_structure(value))
-        end
+        structure[:_struct_member_values] = dump_struct_member_values_hash(object)
         structure.delete(:_struct_member_values) if structure[:_struct_member_values].empty?
       end
       structure
@@ -188,6 +170,27 @@ module YASL
       object_class_array = class_objects[class_for(object)]
       object_class_array_index = object_class_array&.index(object)
       (object_class_array_index + 1) unless object_class_array_index.nil?
+    end
+    
+    def dump_class_variables_hash(object)
+      object.class_variables.reduce({}) do |class_vars, var|
+        value = object.class_variable_get(var)
+        unserializable?(value) ? class_vars : class_vars.merge(var.to_s.sub('@@', '') => dump_structure(value))
+      end
+    end
+    
+    def dump_instance_variables_hash(object)
+      object.instance_variables.sort.reduce({}) do |instance_vars, var|
+        value = object.instance_variable_get(var)
+        unserializable?(value) ? instance_vars : instance_vars.merge(var.to_s.sub('@', '') => dump_structure(value))
+      end
+    end
+    
+    def dump_struct_member_values_hash(object)
+      object.members.reduce({}) do |member_values, member|
+        value = object[member]
+        value.nil? || unserializable?(value) ? member_values : member_values.merge(member => dump_structure(value))
+      end
     end
     
     def add_to_class_array(object)

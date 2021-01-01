@@ -6,6 +6,8 @@
 - Make load `whitelist_classes` work with string class names
 - Make load `whitelist_classes` work with a single class or class name string
 - Support deserialization fallback of instance variables for Struct member values
+- Added missing hash method to optional pure Ruby Struct implementation
+- Fixed issue with requiring one arg minimum, using `select`, and using undefined `upcase?` in implementation of optional pure Ruby Struct
 
 ## 0.2.0
 
