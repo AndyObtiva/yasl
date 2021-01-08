@@ -6,6 +6,8 @@
 
 A pure Ruby serialization library that works across different Ruby implementations like [Opal](https://opalrb.com/) and [JRuby](https://www.jruby.org/) as an alternative to YAML/Marshal.
 
+Read this [blog post](http://andymaleh.blogspot.com/2020/12/yet-another-serialization-library.html?m=1) for an introduction. 
+
 (Note: this is an early alpha gem, so please use with caution, and report any encountered issues or feature suggestions to help improve)
 
 ## Requirements
