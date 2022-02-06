@@ -16,8 +16,8 @@ Juwelier::Tasks.new do |gem|
   gem.name = "yasl"
   gem.homepage = "http://github.com/AndyObtiva/yasl"
   gem.license = "MIT"
-  gem.summary = %Q{A pure Ruby serialization library that works across different Ruby implementations like Opal and JRuby as an alternative to YAML/Marshal.}
-  gem.description = %Q{A pure Ruby serialization library that works across different Ruby implementations like Opal and JRuby as an alternative to YAML/Marshal.}
+  gem.summary = %Q{Yet Another Serialization Library}
+  gem.description = %Q{Yet Another Serialization Library - A pure Ruby serialization library that works across different Ruby implementations like Opal and JRuby as an alternative to YAML/Marshal.}
   gem.email = "andy.am@gmail.com"
   gem.authors = ["Andy Maleh"]
   gem.files = Dir['README.md', 'LICENSE.txt', 'VERSION', 'CHANGELOG.md', 'yasl.gemspec', 'lib/**/*']
