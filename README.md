@@ -4,7 +4,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/AndyObtiva/yasl/badge.svg?branch=master)](https://coveralls.io/github/AndyObtiva/yasl?branch=master)
 [![Maintainability](https://api.codeclimate.com/v1/badges/e8d043b8c78c801f0aa3/maintainability)](https://codeclimate.com/github/AndyObtiva/yasl/maintainability)
 
-A pure Ruby serialization library that works across different Ruby implementations like [Opal](https://opalrb.com/) and [JRuby](https://www.jruby.org/) as an alternative to YAML/Marshal.
+A pure Ruby auto-serialization library that works across different Ruby implementations like [Opal](https://opalrb.com/) and [JRuby](https://www.jruby.org/) as an alternative to YAML/Marshal.
 
 Read this [blog post](http://andymaleh.blogspot.com/2020/12/yet-another-serialization-library.html?m=1) for an introduction. 
 
